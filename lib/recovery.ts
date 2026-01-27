@@ -14,14 +14,15 @@ export function generateRecoveryPlan(
   }
 
   const sleepTips: string[] = [
-    'Maintain consistent sleep and wake times, even on weekends',
-    'Keep your bedroom cool (65-68°F / 18-20°C)',
-    'Avoid screens 1 hour before bed',
-    'Limit caffeine after 2 PM',
+    'Sleep is the #1 recovery tool — growth hormone peaks during deep sleep. Prioritize it over any supplement.',
+    'Maintain consistent sleep and wake times, even on weekends. Circadian rhythm consistency improves sleep quality.',
+    'Keep your bedroom cool (65-68°F / 18-20°C) — core temperature drop is a sleep trigger.',
+    'Limit caffeine after 2 PM — caffeine has a half-life of 5-6 hours and disrupts deep sleep even if you fall asleep fine.',
+    'Avoid screens 1 hour before bed, or use blue-light blocking glasses. Blue light suppresses melatonin production.',
   ];
 
   if (profile.goal === 'bulk' || profile.goal === 'aesthetic') {
-    sleepTips.push('Consider a casein protein shake before bed for overnight muscle protein synthesis');
+    sleepTips.push('30-40g casein protein before bed provides a slow amino acid release that supports overnight muscle protein synthesis (Snijders et al. 2015).');
   }
 
   // Rest days based on training frequency
@@ -60,11 +61,11 @@ export function generateRecoveryPlan(
 
   // Stress management
   const stressManagement = [
-    'Practice deep breathing exercises (5 minutes daily)',
-    'Consider meditation or mindfulness practice',
-    'Limit high-intensity training when life stress is high',
-    'Take deload weeks every 4-6 weeks',
-    'Track recovery metrics (sleep quality, morning heart rate, energy levels)',
+    'Chronic stress elevates cortisol, which impairs recovery and promotes fat storage. Managing stress is directly tied to training results.',
+    'Practice deep breathing or box breathing (4-4-4-4) for 5 min daily — activates parasympathetic nervous system for recovery.',
+    'Auto-regulate training intensity based on life stress. High stress weeks = reduce volume by 20-30% rather than pushing through.',
+    'Deload every 4-6 weeks — reduce volume 40-50%, keep intensity moderate. Fatigue masking fitness is real; deloads reveal your true progress.',
+    'Track recovery metrics: sleep quality, morning resting heart rate, subjective energy. Elevated RHR or persistent fatigue = back off.',
   ];
 
   if (profile.sleepHours && profile.sleepHours < 7) {

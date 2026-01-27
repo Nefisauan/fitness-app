@@ -178,29 +178,31 @@ export function generateNutritionPlan(profile: UserProfile): NutritionPlan {
   const notes: string[] = [];
 
   if (profile.goal === 'lean') {
-    notes.push('Prioritize protein at every meal to preserve muscle during deficit');
-    notes.push('Consider meal timing around workouts for better performance');
-    notes.push('Include fiber-rich foods to stay fuller longer');
+    notes.push('High protein during a deficit is critical — it preserves lean mass and increases satiety (Helms et al. 2014). Aim for 2.0-2.4g/kg.');
+    notes.push('Rate of loss should be 0.5-1% bodyweight per week to minimize muscle loss. Slower cuts preserve more muscle.');
+    notes.push('Prioritize high-volume, low-calorie foods (vegetables, lean protein, berries) for satiety. Fiber slows digestion and keeps you fuller.');
+    notes.push('Refeed days (eating at maintenance 1-2x/week) can help with adherence and hormone regulation during extended deficits.');
   } else if (profile.goal === 'bulk') {
-    notes.push('Spread meals throughout the day if appetite is an issue');
-    notes.push('Add calorie-dense foods like nuts, oils, and avocado');
-    notes.push('Dont skip meals - consistency is key for muscle gain');
+    notes.push('A 200-400 calorie surplus is optimal for muscle gain while minimizing fat. Larger surpluses don\'t build more muscle — just more fat (Iraki et al. 2019).');
+    notes.push('Protein timing matters less than total daily intake, but spreading 4-5 protein feedings across the day maximizes muscle protein synthesis peaks (Schoenfeld & Aragon 2018).');
+    notes.push('Carbs fuel training performance. Prioritize carbs around workouts — pre-workout for energy, post-workout for glycogen replenishment.');
+    notes.push('Track weekly weight trends, not daily fluctuations. Aim for 0.25-0.5% bodyweight gain per week.');
   } else if (profile.goal === 'aesthetic') {
-    notes.push('Focus on food quality and nutrient timing');
-    notes.push('Balance surplus days with training intensity');
+    notes.push('Lean bulking — slight surplus (200-300 cal) maximizes the muscle-to-fat gain ratio. Body recomposition is possible for intermediates at maintenance.');
+    notes.push('Nutrient timing can provide a small edge: 20-40g protein within 2 hours of training supports MPS (muscle protein synthesis).');
   }
 
-  notes.push('Adjust portions based on energy levels and progress');
-  notes.push('Stay consistent with meal timing when possible');
+  notes.push('Weigh yourself at the same time daily (morning, post-bathroom). Use the weekly average to track trends — daily weight fluctuates 1-3 lbs from water alone.');
+  notes.push('Adherence > perfection. Hitting 80-90% of your targets consistently beats hitting 100% sporadically.');
 
   const supplements = [
-    'Creatine monohydrate (5g daily)',
-    'Vitamin D3 if sun exposure is limited',
-    'Omega-3 fatty acids if fish intake is low',
+    'Creatine monohydrate (5g daily) — most researched supplement in sports science. 5-10% strength increase, aids recovery. No need to load or cycle.',
+    'Vitamin D3 (2000-5000 IU daily if sun exposure is limited) — most people are deficient. Supports testosterone, immune function, and bone health.',
+    'Omega-3 fatty acids (2-3g EPA/DHA daily if fish intake is low) — anti-inflammatory, supports joint health and recovery.',
   ];
 
   if (profile.goal === 'lean' || profile.goal === 'recomp') {
-    supplements.push('Caffeine pre-workout (optional)');
+    supplements.push('Caffeine (200-400mg pre-workout) — improves performance by 3-5%, increases fat oxidation. Time it 30-60 min before training.');
   }
 
   return {

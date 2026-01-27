@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
       .filter(([, v]) => v)
       .map(([k]) => k.replace(/([A-Z])/g, ' $1').trim());
 
-    const prompt = `You are an expert fitness coach and movement specialist. Based on the following user profile, generate a detailed physique and movement analysis.
+    const prompt = `You are a science-based hypertrophy and strength coach — think Jeff Nippard meets Dr. Mike Israetel. Your approach is grounded in peer-reviewed exercise science research (Schoenfeld, Krieger, Helms, Israetel). You prioritize evidence-based training principles: progressive overload, optimal volume (10-20 sets/muscle/week), training to appropriate RPE (7-9), lengthened-partial training for maximal hypertrophy, proper frequency (2x/week per muscle), and intelligent exercise selection based on EMG and biomechanics research.
+
+Based on the following user profile, generate a detailed physique and movement analysis.
 
 USER PROFILE:
 - Age: ${profile.age || 'Not provided'}
@@ -41,13 +43,18 @@ USER PROFILE:
 - Pain/Discomfort Areas: ${painList.length > 0 ? painList.join(', ') : 'None reported'}
 - Photos provided: ${hasPhotos ? `Yes (${photoAngles.join(', ')})` : 'No'}
 
-IMPORTANT: Frame all observations as fitness and performance insights, NOT medical diagnoses. Use phrases like "potential indicators of" rather than diagnosing conditions.
+ANALYSIS GUIDELINES:
+- Frame all observations as fitness performance insights, NOT medical diagnoses
+- Reference evidence-based concepts: muscle protein synthesis windows, volume landmarks (MEV, MAV, MRV), progressive overload, and hypertrophy mechanisms (mechanical tension, metabolic stress)
+- For muscle assessments, consider typical imbalances: anterior dominance, quad-to-hamstring ratio, upper vs lower development
+- Be honest and direct — real coaching, not motivational fluff
+- Notes should include actionable hypertrophy-specific advice (e.g. "prioritize lengthened-position exercises" or "increase weekly volume to 15+ sets")
 
 Generate a JSON response with this EXACT structure (no markdown, just JSON):
 {
   "muscle": {
     "groups": [
-      {"name": "Chest", "development": "balanced|underdeveloped|well_developed|overdominant", "score": 1-10, "notes": "brief observation"},
+      {"name": "Chest", "development": "balanced|underdeveloped|well_developed|overdominant", "score": 1-10, "notes": "brief observation with science-based training insight"},
       {"name": "Back", "development": "...", "score": 1-10, "notes": "..."},
       {"name": "Shoulders", "development": "...", "score": 1-10, "notes": "..."},
       {"name": "Arms", "development": "...", "score": 1-10, "notes": "..."},
@@ -63,28 +70,28 @@ Generate a JSON response with this EXACT structure (no markdown, just JSON):
       "frontBack": "balanced|anterior_dominant|posterior_dominant"
     },
     "overallScore": 1-10,
-    "priorityAreas": ["list of muscle groups that need focus"]
+    "priorityAreas": ["list of muscle groups that need focus based on development gaps and symmetry"]
   },
   "posture": {
     "indicators": [
-      {"area": "area name", "indicator": "what you observe", "severity": "mild|moderate|notable", "recommendation": "corrective action"}
+      {"area": "area name", "indicator": "what you observe and the biomechanical implication", "severity": "mild|moderate|notable", "recommendation": "corrective action with specific exercises"}
     ],
     "overallPosture": "good|fair|needs_attention",
     "primaryConcerns": ["list of main concerns"]
   },
   "movement": {
     "flags": [
-      {"movement": "movement name", "observation": "what you observe", "limitation": "mobility|stability|compensation", "affectedArea": "body area", "recommendation": "corrective action"}
+      {"movement": "movement pattern", "observation": "what you observe", "limitation": "mobility|stability|compensation", "affectedArea": "body area", "recommendation": "specific corrective strategy"}
     ],
     "mobilityScore": 1-10,
     "stabilityScore": 1-10,
     "overallMovementQuality": "excellent|good|fair|needs_work"
   },
-  "summary": "2-3 sentence overall assessment",
+  "summary": "2-3 sentence assessment that sounds like a knowledgeable coach — direct, evidence-based, and actionable. Reference specific training principles where relevant.",
   "disclaimer": "These observations are fitness performance insights based on the information provided, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional."
 }
 
-Make realistic assessments based on the training level, activity, and pain areas. For a beginner, scores should be lower. For someone with pain areas, add relevant postural indicators and movement flags. Be specific and actionable.`;
+Be realistic. Beginners should score 3-5. Intermediates 5-7. Only advanced lifters with years of consistent training should score 7+. Most people have anterior dominance and undertrained posterior chain. Be specific and actionable — this should read like advice from a coach who actually knows the research.`;
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -126,15 +133,15 @@ function generateDemoAnalysis(profile: UserProfile, painAreas: PainDiscomfort): 
   const armsDev: Dev = profile.trainingHistory === 'beginner' ? ud : bal;
 
   const groups: { name: string; development: Dev; score: number; notes: string }[] = [
-    { name: 'Chest', development: beginnerDev, score: baseScore, notes: isBeginnerOrSedentary ? 'Building a foundation here will improve upper body aesthetics' : 'Proportionate development relative to training level' },
-    { name: 'Back', development: beginnerDev, score: baseScore - 1, notes: 'Posterior chain development is key for posture and pulling strength' },
-    { name: 'Shoulders', development: bal, score: baseScore, notes: 'Shoulder development helps create a balanced upper body frame' },
-    { name: 'Arms', development: armsDev, score: baseScore, notes: 'Arms develop well with compound movements' },
-    { name: 'Core', development: beginnerDev, score: baseScore - 1, notes: 'Core strength is foundational for all movements' },
-    { name: 'Quads', development: bal, score: baseScore, notes: 'Quad development supports knee stability and athletic performance' },
-    { name: 'Hamstrings', development: ud, score: baseScore - 2, notes: 'Often undertrained relative to quads - important for balance' },
-    { name: 'Glutes', development: beginnerDev, score: baseScore - 1, notes: 'Glute strength is crucial for hip stability and lower back health' },
-    { name: 'Calves', development: ud, score: baseScore - 2, notes: 'Commonly undertrained - important for ankle stability' },
+    { name: 'Chest', development: beginnerDev, score: baseScore, notes: isBeginnerOrSedentary ? 'Low baseline — focus on bench press and incline DB press as primary drivers. Target 12-16 sets/week to establish MEV.' : 'Solid foundation. Prioritize incline work (30°) for clavicular head and pec deck for lengthened-partial stimulus.' },
+    { name: 'Back', development: beginnerDev, score: baseScore - 1, notes: 'Posterior chain is typically underdeveloped relative to anterior. Prioritize horizontal rows and vertical pulls. Target 15-20 sets/week — back can handle high volume.' },
+    { name: 'Shoulders', development: bal, score: baseScore, notes: 'Front delts get plenty of work from pressing. Focus on lateral raises (cable preferred for lengthened tension) and rear delts. Side delts respond to 15-20+ weekly sets.' },
+    { name: 'Arms', development: armsDev, score: baseScore, notes: 'Biceps: incline curls for long head stretch. Triceps: overhead extensions for long head. 8-14 sets/week each. Arms grow from compounds + targeted isolation.' },
+    { name: 'Core', development: beginnerDev, score: baseScore - 1, notes: 'Core stability enables progressive overload on compounds. Prioritize anti-extension (ab wheel) and anti-rotation (Pallof press). Cable crunches for rectus abdominis hypertrophy.' },
+    { name: 'Quads', development: bal, score: baseScore, notes: 'Squats and leg press as primary drivers. Leg extension for isolation. Research supports training quads at longer muscle lengths (deep squats, full ROM leg press) for maximal growth.' },
+    { name: 'Hamstrings', development: ud, score: baseScore - 2, notes: 'Commonly undertrained — most people have a quad-dominant imbalance. RDLs (hip-dominant) + leg curls (knee-dominant) = complete hamstring development. Both movement patterns needed.' },
+    { name: 'Glutes', development: beginnerDev, score: baseScore - 1, notes: 'Hip thrusts show highest glute EMG activation. RDLs and deep squats also contribute. Glute strength is foundational for hip stability and athletic performance.' },
+    { name: 'Calves', development: ud, score: baseScore - 2, notes: 'Calves respond to slow eccentrics and full ROM. Standing raises for gastrocnemius, seated for soleus. Train 3-4x/week with 8-12 sets total. Most people need higher frequency here.' },
   ];
 
   type Severity = 'mild' | 'moderate' | 'notable';
@@ -240,9 +247,9 @@ function generateDemoAnalysis(profile: UserProfile, painAreas: PainDiscomfort): 
     },
     summary: `Based on your ${profile.trainingHistory} training background and ${profile.activityLevel} activity level, ${
       isBeginnerOrSedentary
-        ? 'there is significant room for development across all muscle groups. Building a strong foundation with compound movements will be the most effective approach.'
-        : 'you have a solid foundation to build upon. Focus on addressing weak points and imbalances to continue progressing.'
-    } ${hasPainAreas ? 'The reported discomfort areas suggest some movement limitations that should be addressed through targeted mobility and strengthening work.' : 'No significant limitations reported, allowing for a progressive training approach.'}`,
+        ? 'you\'re in the highest-potential phase of training. Beginners can add weight to the bar almost every session through neural adaptations. Focus on mastering compound movement patterns (squat, bench, row, RDL) and progressive overload. Consistency beats optimization at this stage.'
+        : 'you have a solid base to build on. The focus now should shift to intelligent volume management, hitting 10-20 sets per muscle group per week, training to RPE 7-9, and prioritizing lengthened-position exercises for maximal hypertrophy.'
+    } ${hasPainAreas ? 'The reported discomfort areas indicate movement limitations that need corrective work — address these with targeted mobility and strengthening before pushing intensity.' : 'No significant movement limitations reported, so progressive overload can be pursued aggressively.'}`,
     disclaimer: 'These observations are fitness performance insights based on the information provided, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional.',
   };
 }
