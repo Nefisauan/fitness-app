@@ -1,4 +1,4 @@
-import { UserProfile, PainDiscomfort, PhysiqueAnalysis, WorkoutPlan, WorkoutDay, Exercise } from './types';
+import { UserProfile, PainDiscomfort, PhysiqueAnalysis, WorkoutPlan, WorkoutDay, Exercise, WorkoutSplit } from './types';
 
 // Exercise database by muscle group and purpose
 const exerciseDatabase: Record<string, Exercise[]> = {
@@ -256,28 +256,50 @@ export function generateWorkoutPlan(
   let planName: string;
   let description: string;
 
-  // Select split based on experience and goal
-  if (profile.trainingHistory === 'beginner') {
-    schedule = buildFullBodySplit(profile, painAreas);
-    daysPerWeek = 3;
-    planName = 'Full Body Foundation';
-    description = 'A balanced full-body routine to build strength and movement patterns. Perform 3 times per week with at least one rest day between sessions.';
-  } else if (profile.goal === 'posture' || (analysis?.posture?.overallPosture === 'needs_attention')) {
-    schedule = buildUpperLowerSplit(profile, painAreas);
-    schedule = addPosturalWork(schedule, analysis);
-    daysPerWeek = 4;
-    planName = 'Posture & Balance Program';
-    description = 'Focused on correcting imbalances and improving posture while building strength. Includes dedicated mobility and corrective exercises.';
-  } else if (profile.goal === 'bulk' || profile.goal === 'aesthetic') {
-    schedule = buildPPLSplit(profile, painAreas, analysis);
-    daysPerWeek = 6;
-    planName = profile.goal === 'bulk' ? 'Muscle Building Program' : 'Aesthetic Development';
-    description = 'Push/Pull/Legs split for maximum muscle development. Run through twice per week for optimal growth.';
+  const splitPref: WorkoutSplit = profile.splitPreference || 'recommended';
+
+  if (splitPref !== 'recommended') {
+    // User explicitly chose a split
+    if (splitPref === 'full_body') {
+      schedule = buildFullBodySplit(profile, painAreas);
+      daysPerWeek = 3;
+      planName = 'Full Body Program';
+      description = 'A balanced full-body routine hitting all major muscle groups each session. Perform 3 times per week with at least one rest day between sessions.';
+    } else if (splitPref === 'upper_lower') {
+      schedule = buildUpperLowerSplit(profile, painAreas);
+      daysPerWeek = 4;
+      planName = 'Upper / Lower Split';
+      description = 'Upper/Lower split for balanced volume and recovery. Alternate upper and lower days, 4 sessions per week.';
+    } else {
+      schedule = buildPPLSplit(profile, painAreas, analysis);
+      daysPerWeek = 6;
+      planName = 'Push / Pull / Legs';
+      description = 'Push/Pull/Legs split for high training volume. Run through twice per week for optimal muscle development.';
+    }
   } else {
-    schedule = buildUpperLowerSplit(profile, painAreas);
-    daysPerWeek = 4;
-    planName = 'Strength & Conditioning';
-    description = 'Upper/Lower split for balanced strength development. Allows adequate recovery while maintaining training frequency.';
+    // Auto-select split based on experience and goal (existing logic)
+    if (profile.trainingHistory === 'beginner') {
+      schedule = buildFullBodySplit(profile, painAreas);
+      daysPerWeek = 3;
+      planName = 'Full Body Foundation';
+      description = 'A balanced full-body routine to build strength and movement patterns. Perform 3 times per week with at least one rest day between sessions.';
+    } else if (profile.goal === 'posture' || (analysis?.posture?.overallPosture === 'needs_attention')) {
+      schedule = buildUpperLowerSplit(profile, painAreas);
+      schedule = addPosturalWork(schedule, analysis);
+      daysPerWeek = 4;
+      planName = 'Posture & Balance Program';
+      description = 'Focused on correcting imbalances and improving posture while building strength. Includes dedicated mobility and corrective exercises.';
+    } else if (profile.goal === 'bulk' || profile.goal === 'aesthetic') {
+      schedule = buildPPLSplit(profile, painAreas, analysis);
+      daysPerWeek = 6;
+      planName = profile.goal === 'bulk' ? 'Muscle Building Program' : 'Aesthetic Development';
+      description = 'Push/Pull/Legs split for maximum muscle development. Run through twice per week for optimal growth.';
+    } else {
+      schedule = buildUpperLowerSplit(profile, painAreas);
+      daysPerWeek = 4;
+      planName = 'Strength & Conditioning';
+      description = 'Upper/Lower split for balanced strength development. Allows adequate recovery while maintaining training frequency.';
+    }
   }
 
   // Add postural work if needed

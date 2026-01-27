@@ -7,6 +7,7 @@ import AnalysisResults from '@/components/AnalysisResults';
 import WorkoutPlanComponent from '@/components/WorkoutPlan';
 import NutritionPlanComponent from '@/components/NutritionPlan';
 import ProgressTracker from '@/components/ProgressTracker';
+import DownloadPDF from '@/components/DownloadPDF';
 import { UserProfile, PainDiscomfort, UploadedMedia, PhysiqueAnalysis, WorkoutPlan, NutritionPlan, RecoveryPlan } from '@/lib/types';
 import { generateWorkoutPlan } from '@/lib/workout';
 import { generateNutritionPlan } from '@/lib/nutrition';
@@ -33,6 +34,7 @@ export default function Home() {
     activityLevel: 'moderate',
     trainingHistory: 'intermediate',
     goal: 'aesthetic',
+    splitPreference: 'recommended',
   });
   const [painAreas, setPainAreas] = useState<PainDiscomfort>({
     lowerBack: false,
@@ -288,12 +290,36 @@ export default function Home() {
 
         {/* Workout Tab */}
         {activeTab === 'workout' && workoutPlan && (
-          <WorkoutPlanComponent plan={workoutPlan} />
+          <div className="space-y-4">
+            {nutritionPlan && recoveryPlan && (
+              <div className="flex justify-end">
+                <DownloadPDF
+                  workoutPlan={workoutPlan}
+                  nutritionPlan={nutritionPlan}
+                  recoveryPlan={recoveryPlan}
+                  profile={profile}
+                />
+              </div>
+            )}
+            <WorkoutPlanComponent plan={workoutPlan} />
+          </div>
         )}
 
         {/* Nutrition Tab */}
         {activeTab === 'nutrition' && nutritionPlan && recoveryPlan && (
-          <NutritionPlanComponent nutrition={nutritionPlan} recovery={recoveryPlan} />
+          <div className="space-y-4">
+            {workoutPlan && (
+              <div className="flex justify-end">
+                <DownloadPDF
+                  workoutPlan={workoutPlan}
+                  nutritionPlan={nutritionPlan}
+                  recoveryPlan={recoveryPlan}
+                  profile={profile}
+                />
+              </div>
+            )}
+            <NutritionPlanComponent nutrition={nutritionPlan} recovery={recoveryPlan} />
+          </div>
         )}
 
         {/* Progress Tab */}

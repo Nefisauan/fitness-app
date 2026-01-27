@@ -8,9 +8,11 @@ export interface UserProfile {
   sleepHours?: number;
   trainingHistory: 'beginner' | 'intermediate' | 'advanced';
   goal: FitnessGoal;
+  splitPreference: WorkoutSplit;
 }
 
 export type FitnessGoal = 'lean' | 'bulk' | 'aesthetic' | 'recomp' | 'posture';
+export type WorkoutSplit = 'full_body' | 'upper_lower' | 'ppl' | 'recommended';
 
 export interface PainDiscomfort {
   lowerBack: boolean;

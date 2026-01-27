@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfile, PainDiscomfort, FitnessGoal } from '@/lib/types';
+import { UserProfile, PainDiscomfort, FitnessGoal, WorkoutSplit } from '@/lib/types';
 
 interface UserProfileFormProps {
   profile: UserProfile;
@@ -39,6 +39,13 @@ const painAreasList: { id: keyof PainDiscomfort; label: string }[] = [
   { id: 'hips', label: 'Hips' },
   { id: 'ankles', label: 'Ankles' },
   { id: 'wrists', label: 'Wrists' },
+];
+
+const splitOptions: { id: WorkoutSplit; label: string; description: string; icon: string }[] = [
+  { id: 'recommended', label: 'Recommended', description: 'Auto-select based on your goal & level', icon: '✨' },
+  { id: 'full_body', label: 'Full Body', description: '3 days/week, great for beginners', icon: '🏋️' },
+  { id: 'upper_lower', label: 'Upper / Lower', description: '4 days/week, balanced volume & recovery', icon: '🔄' },
+  { id: 'ppl', label: 'Push / Pull / Legs', description: '6 days/week, high volume for advanced', icon: '💪' },
 ];
 
 export default function UserProfileForm({
@@ -248,6 +255,39 @@ export default function UserProfileForm({
           This helps us recommend appropriate exercises and modifications. Always consult a healthcare
           provider for persistent pain or injuries.
         </p>
+      </div>
+
+      {/* Preferred Split */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Preferred Split</h2>
+            <p className="text-sm text-gray-500">Choose your workout structure</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {splitOptions.map(split => (
+            <button
+              key={split.id}
+              onClick={() => updateProfile({ splitPreference: split.id })}
+              className={`p-4 rounded-xl border-2 text-left transition-all ${
+                profile.splitPreference === split.id
+                  ? 'border-violet-500 bg-violet-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <span className="text-2xl">{split.icon}</span>
+              <p className="font-medium text-gray-900 mt-2 text-sm">{split.label}</p>
+              <p className="text-xs text-gray-500 mt-1">{split.description}</p>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
