@@ -16,8 +16,11 @@ export default function DownloadPDF({ workoutPlan, nutritionPlan, recoveryPlan, 
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const { generatePDF } = await import('@/lib/pdf-generator');
-      generatePDF({ workoutPlan, nutritionPlan, recoveryPlan, profile });
+      const mod = await import('@/lib/pdf-generator');
+      mod.generatePDF({ workoutPlan, nutritionPlan, recoveryPlan, profile });
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('Failed to generate PDF. Please try again.');
     } finally {
       setLoading(false);
     }
