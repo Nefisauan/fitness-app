@@ -30,7 +30,7 @@ export default function DownloadPDF({ workoutPlan, nutritionPlan, recoveryPlan, 
     <button
       onClick={handleDownload}
       disabled={loading}
-      className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+      className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-600 text-white rounded-xl text-sm font-semibold hover:from-cyan-400 hover:to-violet-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-violet-500/50"
     >
       {loading ? (
         <>

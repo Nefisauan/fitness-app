@@ -11,37 +11,37 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
   const [expanded, setExpanded] = useState(false);
 
   const purposeColors: Record<string, string> = {
-    strength: 'bg-red-100 text-red-700',
-    hypertrophy: 'bg-blue-100 text-blue-700',
-    mobility: 'bg-green-100 text-green-700',
-    stability: 'bg-purple-100 text-purple-700',
-    warmup: 'bg-yellow-100 text-yellow-700',
+    strength: 'bg-red-500/15 text-red-300',
+    hypertrophy: 'bg-blue-500/15 text-blue-300',
+    mobility: 'bg-green-500/15 text-green-300',
+    stability: 'bg-purple-500/15 text-purple-300',
+    warmup: 'bg-yellow-500/15 text-yellow-300',
   };
 
   return (
     <div
       className={`p-4 rounded-xl border transition-all cursor-pointer ${
-        expanded ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 hover:border-gray-300'
+        expanded ? 'border-emerald-400 bg-emerald-500/10 shadow-lg shadow-emerald-500/20' : 'border-slate-700 hover:border-slate-600 bg-white/5'
       }`}
       onClick={() => setExpanded(!expanded)}
     >
       <div className="flex items-center gap-4">
-        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-medium text-gray-600">
+        <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-sm font-medium text-slate-300">
           {index + 1}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+            <h4 className="font-medium text-slate-100">{exercise.name}</h4>
             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${purposeColors[exercise.purpose]}`}>
               {exercise.purpose}
             </span>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-400">
             {exercise.sets} sets × {exercise.reps} • Rest: {exercise.rest}
           </p>
         </div>
         <svg
-          className={`w-5 h-5 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-slate-500 transition-transform ${expanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -51,22 +51,22 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
       </div>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+        <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-3">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-gray-500">Target Muscles</p>
-              <p className="font-medium text-gray-900">{exercise.targetMuscles.join(', ')}</p>
+              <p className="text-slate-500">Target Muscles</p>
+              <p className="font-medium text-slate-200">{exercise.targetMuscles.join(', ')}</p>
             </div>
             {exercise.tempo && (
               <div>
-                <p className="text-gray-500">Tempo</p>
-                <p className="font-medium text-gray-900">{exercise.tempo}</p>
+                <p className="text-slate-500">Tempo</p>
+                <p className="font-medium text-slate-200">{exercise.tempo}</p>
               </div>
             )}
           </div>
           {exercise.notes && (
-            <div className="p-3 bg-white rounded-lg">
-              <p className="text-sm text-gray-600">{exercise.notes}</p>
+            <div className="p-3 bg-white/5 rounded-lg border border-slate-800/30">
+              <p className="text-sm text-slate-300">{exercise.notes}</p>
             </div>
           )}
         </div>
@@ -79,26 +79,26 @@ function DaySection({ day }: { day: WorkoutDay }) {
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl shadow-black/40 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 shadow-lg shadow-emerald-500/30 rounded-xl flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
           <div className="text-left">
-            <h3 className="font-semibold text-gray-900">{day.day}</h3>
-            <p className="text-sm text-gray-500">{day.focus}</p>
+            <h3 className="font-semibold text-slate-100">{day.day}</h3>
+            <p className="text-sm text-slate-400">{day.focus}</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">{day.estimatedDuration} min</span>
+          <span className="text-sm text-slate-400">{day.estimatedDuration} min</span>
           <svg
-            className={`w-5 h-5 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 text-slate-500 transition-transform ${expanded ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -112,9 +112,9 @@ function DaySection({ day }: { day: WorkoutDay }) {
         <div className="px-6 pb-6 space-y-6">
           {/* Warmup */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-              <span className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h4 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 bg-yellow-500/15 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
                 </svg>
               </span>
@@ -129,9 +129,9 @@ function DaySection({ day }: { day: WorkoutDay }) {
 
           {/* Main Workout */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-              <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h4 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 bg-blue-500/15 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </span>
@@ -146,9 +146,9 @@ function DaySection({ day }: { day: WorkoutDay }) {
 
           {/* Cooldown */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-              <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h4 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 bg-green-500/15 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </span>
@@ -170,7 +170,7 @@ export default function WorkoutPlan({ plan }: WorkoutPlanProps) {
   return (
     <div className="space-y-6">
       {/* Plan Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white shadow-2xl shadow-emerald-500/30">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h2 className="text-2xl font-bold">{plan.name}</h2>
@@ -192,8 +192,8 @@ export default function WorkoutPlan({ plan }: WorkoutPlanProps) {
 
       {/* Modifications */}
       {plan.modifications.length > 0 && (
-        <div className="bg-amber-50 rounded-2xl p-6">
-          <h3 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6">
+          <h3 className="font-semibold text-amber-300 mb-3 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -201,8 +201,8 @@ export default function WorkoutPlan({ plan }: WorkoutPlanProps) {
           </h3>
           <ul className="space-y-2">
             {plan.modifications.map((mod, index) => (
-              <li key={index} className="flex items-start gap-2 text-amber-700">
-                <span className="text-amber-500 mt-1">•</span>
+              <li key={index} className="flex items-start gap-2 text-amber-300">
+                <span className="text-amber-400 mt-1">•</span>
                 <span>{mod}</span>
               </li>
             ))}
@@ -211,14 +211,14 @@ export default function WorkoutPlan({ plan }: WorkoutPlanProps) {
       )}
 
       {/* Progression Notes */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl shadow-black/40 p-6">
+        <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
           <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
           Progression Guidelines
         </h3>
-        <div className="prose prose-sm text-gray-600 max-w-none">
+        <div className="prose prose-sm text-slate-300 max-w-none">
           {plan.progressionNotes.split('\n').map((line, i) => (
             <p key={i} className="mb-1">{line.replace(/^- /, '• ')}</p>
           ))}

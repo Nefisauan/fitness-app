@@ -357,6 +357,119 @@ function buildArnoldSplit(_profile: UserProfile, painAreas: PainDiscomfort, _ana
   return days;
 }
 
+// PPL + Upper/Lower Hybrid: 5 days/week
+// Days 1-3: Push/Pull/Legs, Days 4-5: Upper/Lower
+// Ideal for intermediate lifters wanting 5-day commitment with optimal frequency
+function buildPPLUpperLowerSplit(_profile: UserProfile, painAreas: PainDiscomfort, _analysis?: PhysiqueAnalysis): WorkoutDay[] {
+  const days: WorkoutDay[] = [];
+  const isAdvanced = _profile.trainingHistory === 'advanced';
+
+  const chestExs = getExercisesForMuscle('chest', painAreas);
+  const backExs = getExercisesForMuscle('back', painAreas);
+  const shoulderExs = getExercisesForMuscle('shoulders', painAreas);
+  const armExs = getExercisesForMuscle('arms', painAreas);
+  const legExs = getExercisesForMuscle('legs', painAreas);
+  const coreExs = getExercisesForMuscle('core', painAreas);
+
+  // Day 1: Push (Chest emphasis + Front Delts + Triceps)
+  const pushExercises: Exercise[] = [];
+  pushExercises.push(chestExs[0] || chestExs[2]); // Bench or DB Press
+  pushExercises.push(chestExs[1] || chestExs[3]); // Incline DB or Cable Flyes
+  pushExercises.push(shoulderExs[0] || shoulderExs[4]); // Seated DB OHP
+  pushExercises.push(shoulderExs[1] || shoulderExs[2]); // Lateral Raises
+  pushExercises.push(armExs[3]); // Overhead Tricep Extension
+  pushExercises.push(armExs[4]); // Tricep Pushdowns
+
+  days.push({
+    day: 'Day 1',
+    focus: 'Push (Chest, Front Delts, Triceps)',
+    warmup: generateWarmup('Push', painAreas),
+    mainWorkout: pushExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 60,
+  });
+
+  // Day 2: Pull (Back + Rear Delts + Biceps)
+  const pullExercises: Exercise[] = [];
+  pullExercises.push(backExs[1] || backExs[4]); // Barbell Row or Chest-Supported Row
+  pullExercises.push(backExs[2] || backExs[3]); // Pull-Ups or Lat Pulldown
+  pullExercises.push(backExs[5] || backExs[7]); // Cable Row or Straight-Arm Pulldown
+  pullExercises.push(backExs[6]); // Face Pulls
+  pullExercises.push(armExs[0]); // Incline DB Curl
+  pullExercises.push(armExs[2]); // Hammer Curl
+
+  days.push({
+    day: 'Day 2',
+    focus: 'Pull (Back, Rear Delts, Biceps)',
+    warmup: generateWarmup('Pull', painAreas),
+    mainWorkout: pullExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 60,
+  });
+
+  // Day 3: Legs (Quad + Posterior Chain + Calves + Core)
+  const legDay: Exercise[] = [];
+  legDay.push(legExs[0] || legExs[2]); // Squat or Leg Press
+  legDay.push(legExs[1]); // RDL
+  legDay.push(legExs[3] || legExs[9]); // Bulgarian Split Squat or Lunges
+  legDay.push(legExs[4]); // Leg Curl
+  legDay.push(legExs[5]); // Leg Extension
+  legDay.push(legExs[7]); // Standing Calf Raises
+  legDay.push(coreExs[0] || coreExs[1]); // Cable Crunch or Hanging Leg Raise
+
+  days.push({
+    day: 'Day 3',
+    focus: 'Legs (Quads, Hamstrings, Glutes, Calves)',
+    warmup: generateWarmup('Legs', painAreas),
+    mainWorkout: legDay.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 65,
+  });
+
+  // Day 4: Upper (Compound-focused full upper body)
+  const upperExercises: Exercise[] = [];
+  upperExercises.push(chestExs[2] || chestExs[4]); // DB Press or Machine Press
+  upperExercises.push(backExs[4] || backExs[5]); // Chest-Supported Row or Cable Row
+  upperExercises.push(chestExs[3] || chestExs[5]); // Cable Flyes or Pec Deck
+  upperExercises.push(backExs[3] || backExs[7]); // Lat Pulldown or Straight-Arm Pulldown
+  upperExercises.push(shoulderExs[2] || shoulderExs[5]); // Lateral Raises
+  upperExercises.push(shoulderExs[3]); // Reverse Pec Deck
+  if (isAdvanced) {
+    upperExercises.push(armExs[1]); // Barbell Curl
+    upperExercises.push(armExs[5]); // Close-Grip Bench
+  }
+
+  days.push({
+    day: 'Day 4',
+    focus: 'Upper Body (Full Upper Hypertrophy)',
+    warmup: generateWarmup('Upper', painAreas),
+    mainWorkout: upperExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 60,
+  });
+
+  // Day 5: Lower (Posterior emphasis + Glutes + Calves + Core)
+  const lowerExercises: Exercise[] = [];
+  lowerExercises.push(legExs[1]); // RDL
+  lowerExercises.push(legExs[6]); // Hip Thrust
+  lowerExercises.push(legExs[2] || legExs[3]); // Leg Press or Bulgarian Split Squat
+  lowerExercises.push(legExs[4]); // Leg Curl
+  lowerExercises.push(legExs[5]); // Leg Extension
+  lowerExercises.push(legExs[8]); // Seated Calf Raises
+  lowerExercises.push(coreExs[2] || coreExs[3]); // Ab Wheel or Pallof Press
+
+  days.push({
+    day: 'Day 5',
+    focus: 'Lower Body (Posterior Chain, Glutes, Core)',
+    warmup: generateWarmup('Lower', painAreas),
+    mainWorkout: lowerExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 65,
+  });
+
+  return days;
+}
+
 // Add extra isolation volume for user-selected priority muscles
 function applyMusclePriorities(
   days: WorkoutDay[],
@@ -453,6 +566,11 @@ export function generateWorkoutPlan(
       daysPerWeek = 4;
       planName = 'Upper / Lower Hypertrophy';
       description = 'Science-based Upper/Lower split. Each muscle group trained 2x/week for optimal muscle protein synthesis frequency (Schoenfeld 2016). 4 sessions per week balances volume with recovery.';
+    } else if (splitPref === 'ppl_ul') {
+      schedule = buildPPLUpperLowerSplit(profile, painAreas, analysis);
+      daysPerWeek = 5;
+      planName = 'PPL + Upper/Lower Hybrid';
+      description = '5-day hybrid combining Push/Pull/Legs with Upper/Lower. Days 1-3 follow PPL, Days 4-5 add a full Upper and Lower session for extra frequency. Ideal for intermediate-advanced lifters wanting optimal muscle frequency without the 6-day commitment. ~12-18 sets per muscle group weekly.';
     } else if (splitPref === 'arnold') {
       schedule = buildArnoldSplit(profile, painAreas, analysis);
       daysPerWeek = 6;
@@ -482,6 +600,11 @@ export function generateWorkoutPlan(
         daysPerWeek = 6;
         planName = 'Arnold Aesthetic Split';
         description = 'Advanced antagonist split for proportional development. Chest+Back supersets increase training density. Dedicated shoulder+arm day ensures balanced arm and delt volume. Research supports antagonist-paired training for maintaining strength output (Paz et al. 2017).';
+      } else if (profile.trainingHistory === 'intermediate' && (profile.activityLevel === 'active' || profile.activityLevel === 'very_active')) {
+        schedule = buildPPLUpperLowerSplit(profile, painAreas, analysis);
+        daysPerWeek = 5;
+        planName = 'Hybrid Growth Program';
+        description = 'Balanced 5-day hybrid combining the specificity of PPL with the frequency benefits of Upper/Lower. Each muscle group trained 2x/week across 5 sessions. Perfect for intermediate lifters who can commit to 5 consistent training days per week.';
       } else {
         schedule = buildPPLSplit(profile, painAreas, analysis);
         daysPerWeek = 6;

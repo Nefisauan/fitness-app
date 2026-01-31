@@ -244,34 +244,34 @@ export default function HomeClient() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-violet-600 shadow-lg shadow-violet-500/40 rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse">
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-600">Loading your data...</p>
+          <p className="text-sm text-slate-400">Loading your data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-xl shadow-lg shadow-violet-500/30 flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">FitAI Analyzer</h1>
-                <p className="text-xs text-gray-600">AI-Powered Fitness Assessment</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI Analyzer</h1>
+                <p className="text-xs text-slate-400">AI-Powered Fitness Assessment</p>
               </div>
             </div>
 
@@ -287,10 +287,10 @@ export default function HomeClient() {
                     }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       activeTab === tab.id
-                        ? 'bg-violet-100 text-violet-700'
+                        ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-300 border border-cyan-500/30'
                         : tab.requiresAnalysis && !analysis
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'text-slate-600 cursor-not-allowed'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-cyan-300'
                     }`}
                     disabled={tab.requiresAnalysis && !analysis}
                   >
@@ -299,7 +299,7 @@ export default function HomeClient() {
                   </button>
                 ))}
               </nav>
-              <div className="hidden md:block w-px h-6 bg-gray-200" />
+              <div className="hidden md:block w-px h-6 bg-slate-700" />
               <AuthButton />
             </div>
           </div>
@@ -316,10 +316,10 @@ export default function HomeClient() {
                   }}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     activeTab === tab.id
-                      ? 'bg-violet-100 text-violet-700'
+                      ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-300 border border-cyan-500/30'
                       : tab.requiresAnalysis && !analysis
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'text-slate-600 cursor-not-allowed'
+                      : 'text-slate-300 hover:bg-white/5'
                   }`}
                   disabled={tab.requiresAnalysis && !analysis}
                 >
@@ -344,11 +344,11 @@ export default function HomeClient() {
               onPainAreasChange={setPainAreas}
             />
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 shadow-2xl shadow-black/40">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Ready to Analyze</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-semibold text-slate-100">Ready to Analyze</h3>
+                  <p className="text-sm text-slate-400">
                     {photos.length > 0
                       ? `${photos.length} photo(s) uploaded`
                       : 'No photos uploaded (analysis will be based on profile data)'}
@@ -362,8 +362,8 @@ export default function HomeClient() {
                   disabled={isAnalyzing}
                   className={`px-8 py-3 rounded-xl font-semibold text-white transition-all ${
                     isAnalyzing
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
+                      ? 'bg-slate-700 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 shadow-lg shadow-violet-500/50 hover:shadow-xl hover:shadow-violet-500/60'
                   }`}
                 >
                   {isAnalyzing ? (
@@ -381,7 +381,7 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600 text-center">
+            <div className="p-4 bg-white/5 rounded-xl text-sm text-slate-400 text-center border border-slate-800/50">
               This tool provides fitness performance insights only. It is not a substitute for professional
               medical advice, diagnosis, or treatment. Always consult qualified healthcare providers for
               medical concerns.

@@ -13,7 +13,7 @@ export interface UserProfile {
 }
 
 export type FitnessGoal = 'lean' | 'bulk' | 'aesthetic' | 'recomp' | 'posture';
-export type WorkoutSplit = 'full_body' | 'upper_lower' | 'ppl' | 'arnold' | 'recommended';
+export type WorkoutSplit = 'full_body' | 'upper_lower' | 'ppl' | 'ppl_ul' | 'arnold' | 'recommended';
 
 export type MuscleTarget =
   | 'chest'

@@ -50,28 +50,28 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/40">
             <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">FitAI Analyzer</h1>
-          <p className="text-sm text-gray-500 mt-1">AI-Powered Fitness Assessment</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI Analyzer</h1>
+          <p className="text-sm text-slate-400 mt-1">AI-Powered Fitness Assessment</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8 shadow-2xl shadow-black/40">
+          <h2 className="text-lg font-semibold text-slate-100 mb-6">
             {isSignUp ? 'Create an account' : 'Sign in to your account'}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
                 Email
               </label>
               <input
@@ -80,13 +80,13 @@ export default function LoginClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
+                className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">
                 Password
               </label>
               <input
@@ -96,19 +96,19 @@ export default function LoginClient() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
+                className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
                 placeholder="At least 6 characters"
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-300">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-sm text-green-300">
                 {message}
               </div>
             )}
@@ -118,8 +118,8 @@ export default function LoginClient() {
               disabled={loading}
               className={`w-full py-2.5 rounded-xl font-semibold text-white transition-all ${
                 loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
+                  ? 'bg-slate-700 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 shadow-lg shadow-violet-500/50 hover:shadow-xl'
               }`}
             >
               {loading ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Sign In'}
@@ -133,7 +133,7 @@ export default function LoginClient() {
                 setError(null);
                 setMessage(null);
               }}
-              className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+              className="text-sm text-violet-400 hover:text-violet-300 font-medium"
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
