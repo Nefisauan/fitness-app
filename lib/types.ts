@@ -9,10 +9,24 @@ export interface UserProfile {
   trainingHistory: 'beginner' | 'intermediate' | 'advanced';
   goal: FitnessGoal;
   splitPreference: WorkoutSplit;
+  musclePriorities?: MusclePriorities;
 }
 
 export type FitnessGoal = 'lean' | 'bulk' | 'aesthetic' | 'recomp' | 'posture';
-export type WorkoutSplit = 'full_body' | 'upper_lower' | 'ppl' | 'recommended';
+export type WorkoutSplit = 'full_body' | 'upper_lower' | 'ppl' | 'arnold' | 'recommended';
+
+export type MuscleTarget =
+  | 'chest'
+  | 'back'
+  | 'shoulders'
+  | 'quads'
+  | 'hamstrings'
+  | 'glutes'
+  | 'arms'
+  | 'core'
+  | 'calves';
+
+export type MusclePriorities = MuscleTarget[];
 
 export interface PainDiscomfort {
   lowerBack: boolean;

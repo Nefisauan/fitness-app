@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfile, PainDiscomfort, FitnessGoal, WorkoutSplit } from '@/lib/types';
+import { UserProfile, PainDiscomfort, FitnessGoal, WorkoutSplit, MuscleTarget } from '@/lib/types';
 
 interface UserProfileFormProps {
   profile: UserProfile;
@@ -46,6 +46,19 @@ const splitOptions: { id: WorkoutSplit; label: string; description: string; icon
   { id: 'full_body', label: 'Full Body', description: '3 days/week, great for beginners', icon: '🏋️' },
   { id: 'upper_lower', label: 'Upper / Lower', description: '4 days/week, balanced volume & recovery', icon: '🔄' },
   { id: 'ppl', label: 'Push / Pull / Legs', description: '6 days/week, high volume for advanced', icon: '💪' },
+  { id: 'arnold', label: 'Arnold Split', description: '6 days/week, chest+back / shoulders+arms / legs', icon: '🏆' },
+];
+
+const musclePriorityOptions: { id: MuscleTarget; label: string }[] = [
+  { id: 'chest', label: 'Chest' },
+  { id: 'back', label: 'Back' },
+  { id: 'shoulders', label: 'Shoulders' },
+  { id: 'arms', label: 'Arms' },
+  { id: 'quads', label: 'Quads' },
+  { id: 'hamstrings', label: 'Hamstrings' },
+  { id: 'glutes', label: 'Glutes' },
+  { id: 'core', label: 'Core / Abs' },
+  { id: 'calves', label: 'Calves' },
 ];
 
 export default function UserProfileForm({
@@ -62,6 +75,14 @@ export default function UserProfileForm({
     onPainAreasChange({ ...painAreas, [area]: !painAreas[area] });
   };
 
+  const toggleMusclePriority = (muscle: MuscleTarget) => {
+    const current = profile.musclePriorities || [];
+    const updated = current.includes(muscle)
+      ? current.filter(m => m !== muscle)
+      : [...current, muscle];
+    updateProfile({ musclePriorities: updated });
+  };
+
   return (
     <div className="space-y-6">
       {/* Goal Selection */}
@@ -74,7 +95,7 @@ export default function UserProfileForm({
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Your Goal</h2>
-            <p className="text-sm text-gray-500">What do you want to achieve?</p>
+            <p className="text-sm text-gray-600">What do you want to achieve?</p>
           </div>
         </div>
 
@@ -91,7 +112,7 @@ export default function UserProfileForm({
             >
               <span className="text-2xl">{goal.icon}</span>
               <p className="font-medium text-gray-900 mt-2">{goal.label}</p>
-              <p className="text-xs text-gray-500 mt-1">{goal.description}</p>
+              <p className="text-xs text-gray-600 mt-1">{goal.description}</p>
             </button>
           ))}
         </div>
@@ -107,7 +128,7 @@ export default function UserProfileForm({
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Body Stats</h2>
-            <p className="text-sm text-gray-500">Help us calculate your targets</p>
+            <p className="text-sm text-gray-600">Help us calculate your targets</p>
           </div>
         </div>
 
@@ -192,7 +213,7 @@ export default function UserProfileForm({
                   }`}
                 >
                   <span className="text-xs font-medium">{level.label}</span>
-                  <p className="text-xs text-gray-500 mt-0.5">{level.description}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">{level.description}</p>
                 </button>
               ))}
             </div>
@@ -226,7 +247,7 @@ export default function UserProfileForm({
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Pain or Discomfort</h2>
-            <p className="text-sm text-gray-500">Select any areas where you experience issues (optional)</p>
+            <p className="text-sm text-gray-600">Select any areas where you experience issues (optional)</p>
           </div>
         </div>
 
@@ -251,9 +272,53 @@ export default function UserProfileForm({
           ))}
         </div>
 
-        <p className="text-xs text-gray-500 mt-4">
+        <p className="text-xs text-gray-600 mt-4">
           This helps us recommend appropriate exercises and modifications. Always consult a healthcare
           provider for persistent pain or injuries.
+        </p>
+      </div>
+
+      {/* Muscle Priorities */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Muscle Priorities</h2>
+            <p className="text-sm text-gray-600">Select muscles you want to prioritize for extra volume (optional)</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {musclePriorityOptions.map(muscle => {
+            const isSelected = (profile.musclePriorities || []).includes(muscle.id);
+            return (
+              <button
+                key={muscle.id}
+                onClick={() => toggleMusclePriority(muscle.id)}
+                className={`px-4 py-2 rounded-full border transition-all text-sm font-medium ${
+                  isSelected
+                    ? 'border-rose-500 bg-rose-50 text-rose-700'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+              >
+                {isSelected && (
+                  <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                {muscle.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="text-xs text-gray-600 mt-4">
+          Selected muscles get additional isolation exercises and higher weekly volume.
+          Leave empty to train all muscle groups with equal priority.
         </p>
       </div>
 
@@ -267,11 +332,11 @@ export default function UserProfileForm({
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Preferred Split</h2>
-            <p className="text-sm text-gray-500">Choose your workout structure</p>
+            <p className="text-sm text-gray-600">Choose your workout structure</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {splitOptions.map(split => (
             <button
               key={split.id}
@@ -284,7 +349,7 @@ export default function UserProfileForm({
             >
               <span className="text-2xl">{split.icon}</span>
               <p className="font-medium text-gray-900 mt-2 text-sm">{split.label}</p>
-              <p className="text-xs text-gray-500 mt-1">{split.description}</p>
+              <p className="text-xs text-gray-600 mt-1">{split.description}</p>
             </button>
           ))}
         </div>

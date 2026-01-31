@@ -46,6 +46,7 @@ export default function HomeClient() {
     trainingHistory: 'intermediate',
     goal: 'aesthetic',
     splitPreference: 'recommended',
+    musclePriorities: [],
   });
   const [painAreas, setPainAreas] = useState<PainDiscomfort>({
     lowerBack: false,
@@ -250,7 +251,7 @@ export default function HomeClient() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-500">Loading your data...</p>
+          <p className="text-sm text-gray-600">Loading your data...</p>
         </div>
       </div>
     );
@@ -270,7 +271,7 @@ export default function HomeClient() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">FitAI Analyzer</h1>
-                <p className="text-xs text-gray-500">AI-Powered Fitness Assessment</p>
+                <p className="text-xs text-gray-600">AI-Powered Fitness Assessment</p>
               </div>
             </div>
 
@@ -288,7 +289,7 @@ export default function HomeClient() {
                       activeTab === tab.id
                         ? 'bg-violet-100 text-violet-700'
                         : tab.requiresAnalysis && !analysis
-                        ? 'text-gray-300 cursor-not-allowed'
+                        ? 'text-gray-400 cursor-not-allowed'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     disabled={tab.requiresAnalysis && !analysis}
@@ -317,7 +318,7 @@ export default function HomeClient() {
                     activeTab === tab.id
                       ? 'bg-violet-100 text-violet-700'
                       : tab.requiresAnalysis && !analysis
-                      ? 'text-gray-300 cursor-not-allowed'
+                      ? 'text-gray-400 cursor-not-allowed'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                   disabled={tab.requiresAnalysis && !analysis}
@@ -347,7 +348,7 @@ export default function HomeClient() {
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                   <h3 className="font-semibold text-gray-900">Ready to Analyze</h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-600">
                     {photos.length > 0
                       ? `${photos.length} photo(s) uploaded`
                       : 'No photos uploaded (analysis will be based on profile data)'}
@@ -380,7 +381,7 @@ export default function HomeClient() {
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-500 text-center">
+            <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600 text-center">
               This tool provides fitness performance insights only. It is not a substitute for professional
               medical advice, diagnosis, or treatment. Always consult qualified healthcare providers for
               medical concerns.

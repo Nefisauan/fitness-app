@@ -1,4 +1,4 @@
-import { UserProfile, PainDiscomfort, PhysiqueAnalysis, WorkoutPlan, WorkoutDay, Exercise, WorkoutSplit } from './types';
+import { UserProfile, PainDiscomfort, PhysiqueAnalysis, WorkoutPlan, WorkoutDay, Exercise, WorkoutSplit, MuscleTarget, MusclePriorities } from './types';
 
 // Evidence-based exercise database
 // Exercise selection informed by EMG research, biomechanics, and hypertrophy literature
@@ -89,7 +89,7 @@ function generateWarmup(focus: string, _painAreas: PainDiscomfort): Exercise[] {
   if (focus.includes('Push') || focus.includes('Chest') || focus.includes('Shoulder') || focus.includes('Upper')) {
     warmup.push(exerciseDatabase.mobility.find(e => e.name === 'Shoulder Pass-Throughs')!);
   }
-  if (focus.includes('Leg') || focus.includes('Pull') || focus.includes('Lower') || focus.includes('Full')) {
+  if (focus.includes('Leg') || focus.includes('Pull') || focus.includes('Lower') || focus.includes('Full') || focus.includes('Back')) {
     warmup.push(exerciseDatabase.mobility.find(e => e.name === 'Deep Squat Hold')!);
   }
 
@@ -277,6 +277,142 @@ function buildFullBodySplit(_profile: UserProfile, painAreas: PainDiscomfort): W
   }];
 }
 
+// Arnold Split: Antagonist pairing, 6 days/week (3-day rotation x2)
+// Day 1 & 4: Chest + Back
+// Day 2 & 5: Shoulders + Arms
+// Day 3 & 6: Legs + Core
+function buildArnoldSplit(_profile: UserProfile, painAreas: PainDiscomfort, _analysis?: PhysiqueAnalysis): WorkoutDay[] {
+  const days: WorkoutDay[] = [];
+  const isAdvanced = _profile.trainingHistory === 'advanced';
+
+  // Chest + Back (Antagonist Supersets)
+  const chestExs = getExercisesForMuscle('chest', painAreas);
+  const backExs = getExercisesForMuscle('back', painAreas);
+  const cbExercises: Exercise[] = [];
+  cbExercises.push(chestExs[0] || chestExs[2]); // Bench Press
+  cbExercises.push(backExs[2] || backExs[3]);    // Pull-Ups or Lat Pulldown
+  cbExercises.push(chestExs[1] || chestExs[3]);  // Incline DB Press
+  cbExercises.push(backExs[1] || backExs[4]);    // Barbell Row or Chest-Supported Row
+  cbExercises.push(chestExs[5] || chestExs[4]);  // Pec Deck or Machine Press
+  cbExercises.push(backExs[5] || backExs[7]);    // Cable Row or Straight-Arm Pulldown
+  if (isAdvanced) {
+    cbExercises.push(backExs[6]);                 // Face Pulls
+  }
+
+  days.push({
+    day: 'Day 1',
+    focus: 'Chest + Back (Antagonist Supersets)',
+    warmup: generateWarmup('Chest + Back', painAreas),
+    mainWorkout: cbExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 70,
+  });
+
+  // Shoulders + Arms
+  const shoulderExs = getExercisesForMuscle('shoulders', painAreas);
+  const armExs = getExercisesForMuscle('arms', painAreas);
+  const saExercises: Exercise[] = [];
+  saExercises.push(shoulderExs[0] || shoulderExs[4]); // Seated DB OHP
+  saExercises.push(shoulderExs[1] || shoulderExs[2]); // Lateral Raises
+  saExercises.push(shoulderExs[3]);                    // Reverse Pec Deck
+  saExercises.push(armExs[1] || armExs[0]);            // Barbell Curl
+  saExercises.push(armExs[3]);                         // Overhead Tricep Extension
+  saExercises.push(armExs[2]);                         // Hammer Curls
+  saExercises.push(armExs[4]);                         // Tricep Pushdowns
+  if (isAdvanced) {
+    saExercises.push(shoulderExs[5] || shoulderExs[2]); // Extra lateral raise
+  }
+
+  days.push({
+    day: 'Day 2',
+    focus: 'Shoulders + Arms',
+    warmup: generateWarmup('Shoulder', painAreas),
+    mainWorkout: saExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 65,
+  });
+
+  // Legs + Core
+  const legExs = getExercisesForMuscle('legs', painAreas);
+  const coreExs = getExercisesForMuscle('core', painAreas);
+  const legExercises: Exercise[] = [];
+  legExercises.push(legExs[0] || legExs[2]); // Squat or Leg Press
+  legExercises.push(legExs[1]);               // RDL
+  legExercises.push(legExs[3] || legExs[9]); // Bulgarian Split Squat or Lunges
+  legExercises.push(legExs[4]);               // Leg Curl
+  legExercises.push(legExs[5]);               // Leg Extension
+  legExercises.push(legExs[6]);               // Hip Thrust
+  legExercises.push(legExs[7]);               // Standing Calf Raises
+  legExercises.push(coreExs[0] || coreExs[1]); // Cable Crunch or Hanging Leg Raise
+
+  days.push({
+    day: 'Day 3',
+    focus: 'Legs (Quads, Hamstrings, Glutes, Calves) + Core',
+    warmup: generateWarmup('Legs', painAreas),
+    mainWorkout: legExercises.filter(Boolean),
+    cooldown: generateCooldown(),
+    estimatedDuration: 75,
+  });
+
+  return days;
+}
+
+// Add extra isolation volume for user-selected priority muscles
+function applyMusclePriorities(
+  days: WorkoutDay[],
+  priorities: MusclePriorities | undefined,
+  painAreas: PainDiscomfort
+): WorkoutDay[] {
+  if (!priorities || priorities.length === 0) return days;
+
+  const targetToDbKey: Record<MuscleTarget, string> = {
+    chest: 'chest', back: 'back', shoulders: 'shoulders',
+    quads: 'legs', hamstrings: 'legs', glutes: 'legs',
+    arms: 'arms', core: 'core', calves: 'legs',
+  };
+
+  return days.map(day => {
+    const focusLower = day.focus.toLowerCase();
+    const extraExercises: Exercise[] = [];
+
+    for (const target of priorities) {
+      const dayTrainsMuscle =
+        focusLower.includes(target) ||
+        (target === 'quads' && (focusLower.includes('leg') || focusLower.includes('lower') || focusLower.includes('full'))) ||
+        (target === 'hamstrings' && (focusLower.includes('leg') || focusLower.includes('lower') || focusLower.includes('pull') || focusLower.includes('full'))) ||
+        (target === 'glutes' && (focusLower.includes('leg') || focusLower.includes('lower') || focusLower.includes('full'))) ||
+        (target === 'calves' && (focusLower.includes('leg') || focusLower.includes('lower') || focusLower.includes('full'))) ||
+        (target === 'chest' && (focusLower.includes('push') || focusLower.includes('upper') || focusLower.includes('full'))) ||
+        (target === 'back' && (focusLower.includes('pull') || focusLower.includes('upper') || focusLower.includes('full'))) ||
+        (target === 'shoulders' && (focusLower.includes('push') || focusLower.includes('upper') || focusLower.includes('full') || focusLower.includes('shoulder'))) ||
+        (target === 'arms' && (focusLower.includes('push') || focusLower.includes('pull') || focusLower.includes('upper') || focusLower.includes('arm'))) ||
+        (target === 'core' && (focusLower.includes('leg') || focusLower.includes('lower') || focusLower.includes('full') || focusLower.includes('core')));
+
+      if (!dayTrainsMuscle) continue;
+
+      const dbKey = targetToDbKey[target];
+      const available = getExercisesForMuscle(dbKey, painAreas);
+      const existingNames = new Set([...day.mainWorkout.map(e => e.name), ...extraExercises.map(e => e.name)]);
+      const extra = available.find(e => !existingNames.has(e.name));
+
+      if (extra) {
+        extraExercises.push({
+          ...extra,
+          notes: `[PRIORITY] ${extra.notes || ''}`.trim(),
+        });
+      }
+    }
+
+    if (extraExercises.length === 0) return day;
+
+    return {
+      ...day,
+      mainWorkout: [...day.mainWorkout, ...extraExercises],
+      estimatedDuration: day.estimatedDuration + extraExercises.length * 5,
+    };
+  });
+}
+
 function addPosturalWork(days: WorkoutDay[], analysis?: PhysiqueAnalysis): WorkoutDay[] {
   if (!analysis?.posture || analysis.posture.overallPosture === 'good') {
     return days;
@@ -317,6 +453,11 @@ export function generateWorkoutPlan(
       daysPerWeek = 4;
       planName = 'Upper / Lower Hypertrophy';
       description = 'Science-based Upper/Lower split. Each muscle group trained 2x/week for optimal muscle protein synthesis frequency (Schoenfeld 2016). 4 sessions per week balances volume with recovery.';
+    } else if (splitPref === 'arnold') {
+      schedule = buildArnoldSplit(profile, painAreas, analysis);
+      daysPerWeek = 6;
+      planName = 'Arnold Split';
+      description = 'Classic Arnold-style antagonist split. Chest+Back / Shoulders+Arms / Legs, each twice per week. Antagonist supersets increase workout density and may enhance performance through reciprocal inhibition (Robbins et al. 2010). ~15-20 sets per muscle group weekly.';
     } else {
       schedule = buildPPLSplit(profile, painAreas, analysis);
       daysPerWeek = 6;
@@ -336,12 +477,19 @@ export function generateWorkoutPlan(
       planName = 'Corrective Hypertrophy';
       description = 'Strength building with integrated postural correction. Addresses muscle imbalances (anterior/posterior dominance) while still driving hypertrophy. Corrective exercises are programmed as supersets with main lifts.';
     } else if (profile.goal === 'bulk' || profile.goal === 'aesthetic') {
-      schedule = buildPPLSplit(profile, painAreas, analysis);
-      daysPerWeek = 6;
-      planName = profile.goal === 'bulk' ? 'Mass Building Program' : 'Aesthetic Development';
-      description = profile.goal === 'bulk'
-        ? 'High-volume PPL split optimized for maximum muscle growth. 15-20+ sets per muscle group weekly with progressive overload. Emphasis on compound lifts and lengthened-partial training for maximal hypertrophy stimulus.'
-        : 'Balanced PPL split focused on proportional development. Extra side delt and rear delt volume for the capped-shoulder look. Emphasis on V-taper (wide back, capped delts, small waist).';
+      if (profile.trainingHistory === 'advanced' && profile.goal === 'aesthetic') {
+        schedule = buildArnoldSplit(profile, painAreas, analysis);
+        daysPerWeek = 6;
+        planName = 'Arnold Aesthetic Split';
+        description = 'Advanced antagonist split for proportional development. Chest+Back supersets increase training density. Dedicated shoulder+arm day ensures balanced arm and delt volume. Research supports antagonist-paired training for maintaining strength output (Paz et al. 2017).';
+      } else {
+        schedule = buildPPLSplit(profile, painAreas, analysis);
+        daysPerWeek = 6;
+        planName = profile.goal === 'bulk' ? 'Mass Building Program' : 'Aesthetic Development';
+        description = profile.goal === 'bulk'
+          ? 'High-volume PPL split optimized for maximum muscle growth. 15-20+ sets per muscle group weekly with progressive overload. Emphasis on compound lifts and lengthened-partial training for maximal hypertrophy stimulus.'
+          : 'Balanced PPL split focused on proportional development. Extra side delt and rear delt volume for the capped-shoulder look. Emphasis on V-taper (wide back, capped delts, small waist).';
+      }
     } else {
       schedule = buildUpperLowerSplit(profile, painAreas);
       daysPerWeek = 4;
@@ -353,6 +501,9 @@ export function generateWorkoutPlan(
   if (analysis?.posture && analysis.posture.overallPosture !== 'good') {
     schedule = addPosturalWork(schedule, analysis);
   }
+
+  // Add extra volume for user-selected priority muscles
+  schedule = applyMusclePriorities(schedule, profile.musclePriorities, painAreas);
 
   const modifications: string[] = [];
 

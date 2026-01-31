@@ -44,6 +44,7 @@ export async function loadProfile(
       trainingHistory: data.training_history || 'intermediate',
       goal: data.goal || 'aesthetic',
       splitPreference: data.split_preference || 'recommended',
+      musclePriorities: data.muscle_priorities || [],
     },
     painAreas: data.pain_areas || {
       lowerBack: false,
@@ -74,6 +75,7 @@ export async function saveProfile(
     training_history: profile.trainingHistory,
     goal: profile.goal,
     split_preference: profile.splitPreference,
+    muscle_priorities: profile.musclePriorities || [],
     pain_areas: painAreas,
     updated_at: new Date().toISOString(),
   })

@@ -27,7 +27,29 @@ export async function POST(request: NextRequest) {
       .filter(([, v]) => v)
       .map(([k]) => k.replace(/([A-Z])/g, ' $1').trim());
 
-    const prompt = `You are a science-based hypertrophy and strength coach — think Jeff Nippard meets Dr. Mike Israetel. Your approach is grounded in peer-reviewed exercise science research (Schoenfeld, Krieger, Helms, Israetel). You prioritize evidence-based training principles: progressive overload, optimal volume (10-20 sets/muscle/week), training to appropriate RPE (7-9), lengthened-partial training for maximal hypertrophy, proper frequency (2x/week per muscle), and intelligent exercise selection based on EMG and biomechanics research.
+    const musclePrioritiesText = profile.musclePriorities && profile.musclePriorities.length > 0
+      ? profile.musclePriorities.join(', ')
+      : 'None — equal focus across all muscle groups';
+
+    const prompt = `You are a science-based hypertrophy and strength coach grounded in peer-reviewed exercise science. Your programming philosophy draws on the following evidence base:
+
+RESEARCH FOUNDATIONS:
+- Schoenfeld (2010): Mechanisms of hypertrophy — mechanical tension as primary driver, metabolic stress and muscle damage as secondary.
+- Schoenfeld (2017): Dose-response of weekly sets — 10+ sets/muscle/week superior to <5 for hypertrophy. Diminishing returns above ~20.
+- Schoenfeld et al. (2019): Training frequency meta-analysis — 2x/week per muscle group superior to 1x for hypertrophy at matched volume.
+- Israetel (2021): Volume landmarks framework — MEV (Minimum Effective Volume), MAV (Maximum Adaptive Volume), MRV (Maximum Recoverable Volume). Beginners: MEV ~6-8 sets/week. Intermediate: MAV ~12-18. Advanced: may need 20+ for lagging groups.
+- Helms et al. (2016): RPE/RIR autoregulation — training to 1-3 RIR (RPE 7-9) maximizes hypertrophy while managing fatigue.
+- Pedrosa et al. (2023): Lengthened-partial training — exercises that load muscles at long muscle lengths produce superior hypertrophy (e.g. incline curls, overhead tricep extensions, deep squats, seated calf raises).
+- Wolf et al. (2023): Partial ROM at lengthened positions may match or exceed full ROM for hypertrophy in certain muscles.
+- Robbins et al. (2010): Antagonist paired sets — supersetting opposing muscles maintains performance and saves time.
+- Paz et al. (2017): Paired sets improve training efficiency without compromising volume load.
+
+PROGRAMMING PRINCIPLES:
+- Progressive overload (load, volume, or density over time)
+- Stimulus-to-fatigue ratio: prefer exercises that produce high muscle tension with low systemic/joint fatigue
+- Exercise selection by muscle length-tension relationship (lengthened-position exercises preferred)
+- Volume periodization: start at MEV, progress toward MAV across a mesocycle, deload before reaching MRV
+- Frequency: distribute volume across 2-4 sessions/week per muscle for optimal protein synthesis signaling
 
 Based on the following user profile, generate a detailed physique and movement analysis.
 
@@ -42,19 +64,21 @@ USER PROFILE:
 - Sleep: ${profile.sleepHours || 'Not provided'} hours/night
 - Pain/Discomfort Areas: ${painList.length > 0 ? painList.join(', ') : 'None reported'}
 - Photos provided: ${hasPhotos ? `Yes (${photoAngles.join(', ')})` : 'No'}
+- Muscle Priorities (user wants extra focus here): ${musclePrioritiesText}
 
 ANALYSIS GUIDELINES:
 - Frame all observations as fitness performance insights, NOT medical diagnoses
-- Reference evidence-based concepts: muscle protein synthesis windows, volume landmarks (MEV, MAV, MRV), progressive overload, and hypertrophy mechanisms (mechanical tension, metabolic stress)
+- Reference the research above where relevant — cite volume landmarks, stimulus-to-fatigue ratio, lengthened-position training, and autoregulation concepts
 - For muscle assessments, consider typical imbalances: anterior dominance, quad-to-hamstring ratio, upper vs lower development
+- If the user has muscle priorities, emphasize those areas in priorityAreas and provide specific volume/exercise recommendations for them
 - Be honest and direct — real coaching, not motivational fluff
-- Notes should include actionable hypertrophy-specific advice (e.g. "prioritize lengthened-position exercises" or "increase weekly volume to 15+ sets")
+- Notes should include actionable hypertrophy-specific advice referencing the evidence base (e.g. "prioritize lengthened-position exercises like incline curls for long head — Pedrosa 2023" or "push weekly volume toward 15-18 sets — Schoenfeld 2017")
 
 Generate a JSON response with this EXACT structure (no markdown, just JSON):
 {
   "muscle": {
     "groups": [
-      {"name": "Chest", "development": "balanced|underdeveloped|well_developed|overdominant", "score": 1-10, "notes": "brief observation with science-based training insight"},
+      {"name": "Chest", "development": "balanced|underdeveloped|well_developed|overdominant", "score": 1-10, "notes": "brief observation with evidence-based training insight citing relevant research"},
       {"name": "Back", "development": "...", "score": 1-10, "notes": "..."},
       {"name": "Shoulders", "development": "...", "score": 1-10, "notes": "..."},
       {"name": "Arms", "development": "...", "score": 1-10, "notes": "..."},
@@ -70,25 +94,25 @@ Generate a JSON response with this EXACT structure (no markdown, just JSON):
       "frontBack": "balanced|anterior_dominant|posterior_dominant"
     },
     "overallScore": 1-10,
-    "priorityAreas": ["list of muscle groups that need focus based on development gaps and symmetry"]
+    "priorityAreas": ["list of muscle groups needing focus — always include user's muscle priorities plus any detected weak points"]
   },
   "posture": {
     "indicators": [
-      {"area": "area name", "indicator": "what you observe and the biomechanical implication", "severity": "mild|moderate|notable", "recommendation": "corrective action with specific exercises"}
+      {"area": "area name", "indicator": "observation with biomechanical rationale", "severity": "mild|moderate|notable", "recommendation": "corrective action with specific exercises and rationale"}
     ],
     "overallPosture": "good|fair|needs_attention",
     "primaryConcerns": ["list of main concerns"]
   },
   "movement": {
     "flags": [
-      {"movement": "movement pattern", "observation": "what you observe", "limitation": "mobility|stability|compensation", "affectedArea": "body area", "recommendation": "specific corrective strategy"}
+      {"movement": "movement pattern", "observation": "what you observe", "limitation": "mobility|stability|compensation", "affectedArea": "body area", "recommendation": "specific corrective strategy referencing stimulus-to-fatigue or lengthened-position principles"}
     ],
     "mobilityScore": 1-10,
     "stabilityScore": 1-10,
     "overallMovementQuality": "excellent|good|fair|needs_work"
   },
-  "summary": "2-3 sentence assessment that sounds like a knowledgeable coach — direct, evidence-based, and actionable. Reference specific training principles where relevant.",
-  "disclaimer": "These observations are fitness performance insights based on the information provided, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional."
+  "summary": "2-3 sentence evidence-based assessment. Reference volume landmarks, autoregulation, or lengthened-partial training where relevant. If user has muscle priorities, address how to program extra volume for those areas.",
+  "disclaimer": "These observations are fitness performance insights based on the information provided and current exercise science literature, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional."
 }
 
 Be realistic. Beginners should score 3-5. Intermediates 5-7. Only advanced lifters with years of consistent training should score 7+. Most people have anterior dominance and undertrained posterior chain. Be specific and actionable — this should read like advice from a coach who actually knows the research.`;
@@ -215,11 +239,26 @@ function generateDemoAnalysis(profile: UserProfile, painAreas: PainDiscomfort): 
   const mobilityScore = hasPainAreas ? 5 : isBeginnerOrSedentary ? 6 : 7;
   const stabilityScore = isBeginnerOrSedentary ? 5 : 7;
 
-  const priorityAreas = ['Hamstrings', 'Glutes', 'Calves'];
-  if (isBeginnerOrSedentary) {
+  const musclePriorityNames: Record<string, string> = {
+    chest: 'Chest', back: 'Back', shoulders: 'Shoulders', arms: 'Arms',
+    core: 'Core', quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes', calves: 'Calves',
+  };
+
+  // Start with user's explicit priorities, then add detected weak points
+  const priorityAreas: string[] = [];
+  if (profile.musclePriorities && profile.musclePriorities.length > 0) {
+    for (const mp of profile.musclePriorities) {
+      const name = musclePriorityNames[mp];
+      if (name && !priorityAreas.includes(name)) priorityAreas.push(name);
+    }
+  }
+  for (const fallback of ['Hamstrings', 'Glutes', 'Calves']) {
+    if (!priorityAreas.includes(fallback)) priorityAreas.push(fallback);
+  }
+  if (isBeginnerOrSedentary && !priorityAreas.includes('Core')) {
     priorityAreas.unshift('Core');
   }
-  if (painAreas.shoulders || painAreas.neck) {
+  if ((painAreas.shoulders || painAreas.neck) && !priorityAreas.includes('Rear Delts & Upper Back')) {
     priorityAreas.push('Rear Delts & Upper Back');
   }
 
@@ -247,9 +286,9 @@ function generateDemoAnalysis(profile: UserProfile, painAreas: PainDiscomfort): 
     },
     summary: `Based on your ${profile.trainingHistory} training background and ${profile.activityLevel} activity level, ${
       isBeginnerOrSedentary
-        ? 'you\'re in the highest-potential phase of training. Beginners can add weight to the bar almost every session through neural adaptations. Focus on mastering compound movement patterns (squat, bench, row, RDL) and progressive overload. Consistency beats optimization at this stage.'
-        : 'you have a solid base to build on. The focus now should shift to intelligent volume management, hitting 10-20 sets per muscle group per week, training to RPE 7-9, and prioritizing lengthened-position exercises for maximal hypertrophy.'
-    } ${hasPainAreas ? 'The reported discomfort areas indicate movement limitations that need corrective work — address these with targeted mobility and strengthening before pushing intensity.' : 'No significant movement limitations reported, so progressive overload can be pursued aggressively.'}`,
-    disclaimer: 'These observations are fitness performance insights based on the information provided, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional.',
+        ? 'you\'re in the highest-potential phase of training — neural adaptations alone can drive rapid strength gains (Schoenfeld 2010). Start at MEV (~6-8 sets/muscle/week) and master compound patterns (squat, bench, row, RDL) with RPE 7-8 autoregulation. Consistency and progressive overload matter most at this stage.'
+        : 'you have a solid foundation. The focus now shifts to intelligent volume management — targeting your MAV of 12-18 sets/muscle/week (Schoenfeld 2017), training to RPE 7-9 with RIR-based autoregulation (Helms 2016), and prioritizing lengthened-position exercises for maximal hypertrophy (Pedrosa 2023).'
+    }${profile.musclePriorities && profile.musclePriorities.length > 0 ? ` Your selected priority areas (${profile.musclePriorities.join(', ')}) will receive additional volume and targeted isolation work to push toward their MAV.` : ''} ${hasPainAreas ? 'The reported discomfort areas indicate movement limitations that need corrective work — address these with targeted mobility and low-fatigue strengthening before pushing intensity.' : 'No significant movement limitations reported, so progressive overload can be pursued aggressively.'}`,
+    disclaimer: 'These observations are fitness performance insights based on the information provided and current exercise science literature, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional.',
   };
 }
