@@ -159,7 +159,7 @@ export default function PhotoUpload({ onPhotosChange, photos }: PhotoUploadProps
               <li>• Wear form-fitting clothing or athletic wear</li>
               <li>• Use good lighting and a plain background</li>
               <li>• Stand with a natural, relaxed posture</li>
-              <li>• Photos are processed locally and never stored on servers</li>
+              <li>• Assessment photos are processed locally and not stored</li>
             </ul>
           </div>
         </div>

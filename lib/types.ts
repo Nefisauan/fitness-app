@@ -212,3 +212,81 @@ export interface AssessmentResult {
   nutritionPlan: NutritionPlan;
   recoveryPlan: RecoveryPlan;
 }
+
+// ── Workout Tracking Types ─────────────────────────────────────────────
+
+export interface SetLog {
+  setNumber: number;
+  reps: number | null;
+  weight: number | null;
+  completed: boolean;
+}
+
+export interface ExerciseLog {
+  exerciseName: string;
+  section: 'warmup' | 'main' | 'cooldown';
+  planned: { sets: number; reps: string };
+  actual: SetLog[];
+  completed: boolean;
+  skipped: boolean;
+  notes?: string;
+}
+
+export interface WorkoutLog {
+  id: string;
+  assessmentId?: string;
+  workoutDayIndex: number;
+  workoutDayLabel: string;
+  workoutFocus: string;
+  exercises: ExerciseLog[];
+  startedAt: string;
+  completedAt?: string;
+  durationMinutes?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface WorkoutStreak {
+  currentStreak: number;
+  longestStreak: number;
+  totalWorkouts: number;
+  thisWeekCount: number;
+  lastWorkoutDate: string | null;
+}
+
+// ── Weekly Check-in Types ──────────────────────────────────────────────
+
+export interface BodyMeasurements {
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  arms?: number;
+  thighs?: number;
+}
+
+export interface WeeklyCheckin {
+  id: string;
+  checkinDate: string;
+  weight?: number;
+  measurements: BodyMeasurements;
+  energyRating?: number;
+  sorenessRating?: number;
+  sleepRating?: number;
+  motivationRating?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+// ── Progress Photo Types ───────────────────────────────────────────────
+
+export type PhotoAngle = 'front' | 'side' | 'back';
+
+export interface ProgressPhoto {
+  id: string;
+  checkinId?: string;
+  angle: PhotoAngle;
+  storagePath: string;
+  signedUrl?: string;
+  photoDate: string;
+  createdAt: string;
+}

@@ -5,8 +5,10 @@ import PhotoUpload from '@/components/PhotoUpload';
 import UserProfileForm from '@/components/UserProfileForm';
 import AnalysisResults from '@/components/AnalysisResults';
 import WorkoutPlanComponent from '@/components/WorkoutPlan';
+import WorkoutTracker from '@/components/WorkoutTracker';
 import NutritionPlanComponent from '@/components/NutritionPlan';
 import ProgressTracker from '@/components/ProgressTracker';
+import CheckinPromptBanner from '@/components/CheckinPromptBanner';
 import DownloadPDF from '@/components/DownloadPDF';
 import AuthButton from '@/components/AuthButton';
 import { UserProfile, PainDiscomfort, UploadedMedia, PhysiqueAnalysis, WorkoutPlan, NutritionPlan, RecoveryPlan } from '@/lib/types';
@@ -22,8 +24,11 @@ import {
   loadProgressEntries,
   saveProgressEntry,
 } from '@/lib/supabase/database';
+import { useWorkoutTracker } from '@/hooks/useWorkoutTracker';
+import { useWeeklyCheckins } from '@/hooks/useWeeklyCheckins';
+import { useProgressPhotos } from '@/hooks/useProgressPhotos';
 
-type Tab = 'input' | 'analysis' | 'workout' | 'nutrition' | 'progress';
+type Tab = 'input' | 'analysis' | 'workout' | 'tracker' | 'nutrition' | 'progress';
 
 interface ProgressEntry {
   id: string;
@@ -71,6 +76,11 @@ export default function HomeClient() {
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialLoadDone = useRef(false);
+
+  // Custom hooks for retention features
+  const workoutTracker = useWorkoutTracker(supabaseRef, userId, assessmentId, workoutPlan);
+  const weeklyCheckins = useWeeklyCheckins(supabaseRef, userId);
+  const progressPhotos = useProgressPhotos(supabaseRef, userId);
 
   // Load data on mount
   useEffect(() => {
@@ -221,6 +231,16 @@ export default function HomeClient() {
       requiresAnalysis: true,
     },
     {
+      id: 'tracker',
+      label: 'Tracker',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      requiresAnalysis: true,
+    },
+    {
       id: 'nutrition',
       label: 'Nutrition',
       icon: (
@@ -334,6 +354,15 @@ export default function HomeClient() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Check-in prompt banner */}
+        {weeklyCheckins.shouldShowPrompt && (
+          <CheckinPromptBanner
+            daysSinceLastCheckin={weeklyCheckins.daysSinceLastCheckin}
+            onCheckinClick={() => setActiveTab('progress')}
+            onDismiss={weeklyCheckins.dismissPrompt}
+          />
+        )}
+
         {activeTab === 'input' && (
           <div className="space-y-6">
             <PhotoUpload photos={photos} onPhotosChange={setPhotos} />
@@ -352,8 +381,8 @@ export default function HomeClient() {
                     {photos.length > 0
                       ? `${photos.length} photo(s) uploaded`
                       : 'No photos uploaded (analysis will be based on profile data)'}
-                    {' • '}{profile.goal.charAt(0).toUpperCase() + profile.goal.slice(1)} goal
-                    {' • '}{profile.trainingHistory} level
+                    {' \u2022 '}{profile.goal.charAt(0).toUpperCase() + profile.goal.slice(1)} goal
+                    {' \u2022 '}{profile.trainingHistory} level
                   </p>
                 </div>
 
@@ -409,6 +438,22 @@ export default function HomeClient() {
           </div>
         )}
 
+        {activeTab === 'tracker' && workoutPlan && (
+          <WorkoutTracker
+            plan={workoutPlan}
+            workoutLogs={workoutTracker.workoutLogs}
+            streak={workoutTracker.streak}
+            nextDayIndex={workoutTracker.nextDayIndex}
+            activeWorkout={workoutTracker.activeWorkout}
+            onStartWorkout={workoutTracker.startWorkout}
+            onLogSet={workoutTracker.logSet}
+            onCompleteExercise={workoutTracker.completeExercise}
+            onSkipExercise={workoutTracker.skipExercise}
+            onCompleteWorkout={workoutTracker.completeWorkout}
+            onCancelWorkout={workoutTracker.cancelWorkout}
+          />
+        )}
+
         {activeTab === 'nutrition' && nutritionPlan && recoveryPlan && (
           <div className="space-y-4">
             {workoutPlan && (
@@ -430,6 +475,14 @@ export default function HomeClient() {
             currentAnalysis={analysis}
             history={progressHistory}
             onSaveEntry={handleSaveProgress}
+            checkins={weeklyCheckins.checkins}
+            onSaveCheckin={weeklyCheckins.saveCheckin}
+            latestCheckin={weeklyCheckins.latestCheckin}
+            photos={progressPhotos.photos}
+            photoDates={progressPhotos.photoDates}
+            onUploadPhoto={progressPhotos.uploadPhoto}
+            onDeletePhoto={progressPhotos.deletePhoto}
+            getPhotoSignedUrl={progressPhotos.getSignedUrl}
           />
         )}
       </main>
