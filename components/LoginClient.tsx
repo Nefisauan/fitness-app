@@ -60,7 +60,7 @@ export default function LoginClient() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI</h1>
-          <p className="text-sm text-slate-400 mt-1">AI-Powered Fitness Assessment</p>
+          <p className="text-sm text-slate-400 mt-1">Stop guessing your fitness. Measure it.</p>
         </div>
 
         {/* Form Card */}

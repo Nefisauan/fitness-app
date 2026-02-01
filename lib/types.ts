@@ -1,15 +1,19 @@
+// Unit system
+export type UnitSystem = 'metric' | 'imperial';
+
 // User profile and input types
 export interface UserProfile {
   age?: number;
   gender?: 'male' | 'female' | 'other';
-  height?: number; // in cm
-  weight?: number; // in kg
+  height?: number; // always stored in cm
+  weight?: number; // always stored in kg
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   sleepHours?: number;
   trainingHistory: 'beginner' | 'intermediate' | 'advanced';
   goal: FitnessGoal;
   splitPreference: WorkoutSplit;
   musclePriorities?: MusclePriorities;
+  unitPreference: UnitSystem;
 }
 
 export type FitnessGoal = 'lean' | 'bulk' | 'aesthetic' | 'recomp' | 'posture';
@@ -93,10 +97,34 @@ export interface MovementAnalysis {
   overallMovementQuality: 'excellent' | 'good' | 'fair' | 'needs_work';
 }
 
+export interface BodyFatEstimate {
+  percentage: number;
+  range: string;
+  category: 'essential' | 'athletic' | 'fitness' | 'acceptable' | 'elevated';
+  confidence: 'low' | 'moderate' | 'high';
+  notes: string;
+}
+
+export interface Weakness {
+  area: string;
+  description: string;
+  impact: string;
+}
+
+export interface NextStep {
+  action: string;
+  rationale: string;
+  priority: 'high' | 'medium';
+}
+
 export interface PhysiqueAnalysis {
+  fitnessScore: number;
+  bodyFat: BodyFatEstimate;
   muscle: MuscleAnalysis;
   posture: PosturalAnalysis;
   movement: MovementAnalysis;
+  weaknesses: Weakness[];
+  nextSteps: NextStep[];
   summary: string;
   disclaimer: string;
 }

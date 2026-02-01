@@ -51,6 +51,7 @@ export async function loadProfile(
       goal: data.goal || 'aesthetic',
       splitPreference: data.split_preference || 'recommended',
       musclePriorities: data.muscle_priorities || [],
+      unitPreference: data.unit_preference || 'metric',
     },
     painAreas: data.pain_areas || {
       lowerBack: false,
@@ -82,6 +83,7 @@ export async function saveProfile(
     goal: profile.goal,
     split_preference: profile.splitPreference,
     muscle_priorities: profile.musclePriorities || [],
+    unit_preference: profile.unitPreference || 'metric',
     pain_areas: painAreas,
     updated_at: new Date().toISOString(),
   })

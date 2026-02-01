@@ -52,6 +52,7 @@ export default function HomeClient() {
     goal: 'aesthetic',
     splitPreference: 'recommended',
     musclePriorities: [],
+    unitPreference: 'metric',
   });
   const [painAreas, setPainAreas] = useState<PainDiscomfort>({
     lowerBack: false,
@@ -291,7 +292,7 @@ export default function HomeClient() {
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI</h1>
-                <p className="text-xs text-slate-400">AI-Powered Fitness Assessment</p>
+                <p className="text-xs text-slate-400">Stop guessing your fitness. Measure it.</p>
               </div>
             </div>
 

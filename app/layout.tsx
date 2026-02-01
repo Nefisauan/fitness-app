@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitAI - AI-Powered Fitness Assessment",
+  title: "FitAI - Stop Guessing Your Fitness",
   description: "Analyze your physique, muscle development, posture, and movement quality. Get personalized workout plans, nutrition guidance, and track your progress.",
 };
 

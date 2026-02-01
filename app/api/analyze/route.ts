@@ -74,6 +74,22 @@ ANALYSIS GUIDELINES:
 - Be honest and direct — real coaching, not motivational fluff
 - Notes should include actionable hypertrophy-specific advice referencing the evidence base (e.g. "prioritize lengthened-position exercises like incline curls for long head — Pedrosa 2023" or "push weekly volume toward 15-18 sets — Schoenfeld 2017")
 
+BODY FAT ESTIMATION GUIDELINES:
+- Estimate body fat percentage based on: gender, age, height, weight, activity level, training history, and any visual data from photos.
+- Use BMI as a rough starting heuristic, then adjust based on training history (muscular individuals have lower BF% at same BMI), activity level, and visual assessment if photos provided.
+- Male reference ranges: Essential <6%, Athletic 6-13%, Fitness 14-17%, Acceptable 18-24%, Elevated 25%+
+- Female reference ranges: Essential <14%, Athletic 14-20%, Fitness 21-24%, Acceptable 25-31%, Elevated 32%+
+- If no photos provided, confidence should be "low". With photos: "moderate". Be honest about limits.
+- Always provide a range (e.g. "15-18%") to reflect uncertainty.
+
+FITNESS SCORE GUIDELINES:
+- Compute a composite score from 1-100 using: muscle development 40%, posture 20%, movement quality 20%, body composition relative to goal 20%.
+- A beginner with no training history scores 25-45. Intermediate 45-65. Advanced 65-85. Only elite athletes score 85+.
+
+WEAKNESSES AND NEXT STEPS:
+- Identify 2-3 most impactful weaknesses. Be specific (e.g. "Posterior chain deficit" not "needs work"). Explain real-world impact.
+- Provide 1-3 concrete, specific next steps. Not vague ("train harder") but precise ("Add 2 weekly RDL sessions at RPE 7, targeting 10-12 sets/week for hamstrings").
+
 Generate a JSON response with this EXACT structure (no markdown, just JSON):
 {
   "muscle": {
@@ -111,6 +127,20 @@ Generate a JSON response with this EXACT structure (no markdown, just JSON):
     "stabilityScore": 1-10,
     "overallMovementQuality": "excellent|good|fair|needs_work"
   },
+  "fitnessScore": number (1-100 composite score. Weight the components: muscle development 40%, posture quality 20%, movement quality 20%, estimated body composition relative to goal 20%. Beginners 25-45, intermediate 45-65, advanced 65-85, elite 85+),
+  "bodyFat": {
+    "percentage": number (estimated body fat percentage),
+    "range": string (e.g. "15-18%", reflecting estimation uncertainty),
+    "category": "essential" | "athletic" | "fitness" | "acceptable" | "elevated",
+    "confidence": "low" | "moderate" | "high",
+    "notes": string (brief explanation of how you estimated this)
+  },
+  "weaknesses": [
+    { "area": string, "description": string (1-sentence), "impact": string (why this matters) }
+  ] (exactly 2-3 items),
+  "nextSteps": [
+    { "action": string (specific, concrete action), "rationale": string (why this helps), "priority": "high" | "medium" }
+  ] (exactly 1-3 items),
   "summary": "2-3 sentence evidence-based assessment. Reference volume landmarks, autoregulation, or lengthened-partial training where relevant. If user has muscle priorities, address how to program extra volume for those areas.",
   "disclaimer": "These observations are fitness performance insights based on the information provided and current exercise science literature, not medical diagnoses. For persistent pain or injuries, consult a qualified healthcare professional."
 }
@@ -119,7 +149,7 @@ Be realistic. Beginners should score 3-5. Intermediates 5-7. Only advanced lifte
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+      max_tokens: 3000,
       messages: [{ role: 'user', content: prompt }],
     });
 
@@ -263,6 +293,27 @@ function generateDemoAnalysis(profile: UserProfile, painAreas: PainDiscomfort): 
   }
 
   return {
+    fitnessScore: profile.trainingHistory === 'advanced' ? 68 : profile.trainingHistory === 'intermediate' ? 50 : 35,
+    bodyFat: {
+      percentage: profile.gender === 'female'
+        ? (profile.activityLevel === 'sedentary' || profile.activityLevel === 'light' ? 28 : 22)
+        : (profile.activityLevel === 'sedentary' || profile.activityLevel === 'light' ? 22 : 16),
+      range: profile.gender === 'female'
+        ? (profile.activityLevel === 'sedentary' || profile.activityLevel === 'light' ? '26-30%' : '20-24%')
+        : (profile.activityLevel === 'sedentary' || profile.activityLevel === 'light' ? '20-24%' : '14-18%'),
+      category: profile.activityLevel === 'sedentary' || profile.activityLevel === 'light' ? 'acceptable' : 'fitness',
+      confidence: 'low',
+      notes: 'Estimated from profile data only. Accuracy improves with progress photos.',
+    },
+    weaknesses: [
+      { area: 'Posterior Chain', description: 'Hamstrings and glutes likely undertrained relative to quads and anterior chain.', impact: 'Increases injury risk and limits squat/deadlift potential.' },
+      { area: 'Core Stability', description: 'Core development likely lags behind limb strength for this experience level.', impact: 'Limits force transfer in compound lifts and reduces trunk stability.' },
+    ],
+    nextSteps: [
+      { action: 'Add 2 weekly RDL or Romanian deadlift sessions targeting 10-12 sets/week for hamstrings at RPE 7-8.', rationale: 'Addresses the most common posterior chain deficit.', priority: 'high' },
+      { action: 'Include 3 sets of ab wheel rollouts and Pallof presses 3x/week.', rationale: 'Builds core stability needed to safely progress compound lifts.', priority: 'high' },
+      { action: 'Track your workouts for 4 weeks to establish baseline volume and progressive overload.', rationale: 'Without tracking, progression stalls and weaknesses persist.', priority: 'medium' },
+    ],
     muscle: {
       groups,
       symmetry: {

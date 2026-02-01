@@ -1,6 +1,7 @@
 'use client';
 
 import { UserProfile, PainDiscomfort, FitnessGoal, WorkoutSplit, MuscleTarget } from '@/lib/types';
+import { cmToFeetInches, kgToLbs, feetInchesToCm, lbsToKg } from '@/lib/units';
 
 interface UserProfileFormProps {
   profile: UserProfile;
@@ -133,6 +134,26 @@ export default function UserProfileForm({
           </div>
         </div>
 
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-slate-300 mb-2">Units</label>
+          <div className="grid grid-cols-2 gap-2">
+            {(['metric', 'imperial'] as const).map((unit) => (
+              <button
+                key={unit}
+                type="button"
+                onClick={() => updateProfile({ unitPreference: unit })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  profile.unitPreference === unit
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-300 border border-cyan-500/30'
+                    : 'bg-slate-900/50 text-slate-400 border border-slate-700 hover:border-slate-500'
+                }`}
+              >
+                {unit === 'metric' ? 'Metric (cm, kg)' : 'Imperial (ft/in, lbs)'}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Age</label>
@@ -157,26 +178,73 @@ export default function UserProfileForm({
               <option value="other">Other</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Height (cm)</label>
-            <input
-              type="number"
-              value={profile.height || ''}
-              onChange={(e) => updateProfile({ height: parseInt(e.target.value) || undefined })}
-              placeholder="175"
-              className="w-full px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Weight (kg)</label>
-            <input
-              type="number"
-              value={profile.weight || ''}
-              onChange={(e) => updateProfile({ weight: parseInt(e.target.value) || undefined })}
-              placeholder="70"
-              className="w-full px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
-            />
-          </div>
+          {profile.unitPreference === 'imperial' ? (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Height (ft/in)</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={profile.height ? cmToFeetInches(profile.height).feet : ''}
+                  onChange={(e) => {
+                    const feet = parseInt(e.target.value) || 0;
+                    const currentInches = profile.height ? cmToFeetInches(profile.height).inches : 0;
+                    updateProfile({ height: feetInchesToCm(feet, currentInches) });
+                  }}
+                  placeholder="5"
+                  min={3}
+                  max={8}
+                  className="w-1/2 px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                />
+                <input
+                  type="number"
+                  value={profile.height ? cmToFeetInches(profile.height).inches : ''}
+                  onChange={(e) => {
+                    const inches = parseInt(e.target.value) || 0;
+                    const currentFeet = profile.height ? cmToFeetInches(profile.height).feet : 0;
+                    updateProfile({ height: feetInchesToCm(currentFeet, inches) });
+                  }}
+                  placeholder="9"
+                  min={0}
+                  max={11}
+                  className="w-1/2 px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Height (cm)</label>
+              <input
+                type="number"
+                value={profile.height || ''}
+                onChange={(e) => updateProfile({ height: parseInt(e.target.value) || undefined })}
+                placeholder="175"
+                className="w-full px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              />
+            </div>
+          )}
+          {profile.unitPreference === 'imperial' ? (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Weight (lbs)</label>
+              <input
+                type="number"
+                value={profile.weight ? Math.round(kgToLbs(profile.weight)) : ''}
+                onChange={(e) => updateProfile({ weight: lbsToKg(parseInt(e.target.value) || 0) || undefined })}
+                placeholder="154"
+                className="w-full px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Weight (kg)</label>
+              <input
+                type="number"
+                value={profile.weight || ''}
+                onChange={(e) => updateProfile({ weight: parseInt(e.target.value) || undefined })}
+                placeholder="70"
+                className="w-full px-3 py-2 border bg-slate-900/50 border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
