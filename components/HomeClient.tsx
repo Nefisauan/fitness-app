@@ -290,7 +290,7 @@ export default function HomeClient() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI Analyzer</h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">FitAI</h1>
                 <p className="text-xs text-slate-400">AI-Powered Fitness Assessment</p>
               </div>
             </div>
