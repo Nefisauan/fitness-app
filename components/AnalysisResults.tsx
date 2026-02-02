@@ -1,6 +1,7 @@
 'use client';
 
 import { PhysiqueAnalysis } from '@/lib/types';
+import BodyMap from './BodyMap';
 
 interface AnalysisResultsProps {
   analysis: PhysiqueAnalysis;
@@ -193,6 +194,9 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
           </div>
         </div>
       )}
+
+      {/* Muscle Map */}
+      <BodyMap groups={analysis.muscle.groups} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Muscle Analysis */}
