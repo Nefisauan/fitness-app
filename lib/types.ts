@@ -318,3 +318,34 @@ export interface ProgressPhoto {
   photoDate: string;
   createdAt: string;
 }
+
+// ── Assessment Photo Types ────────────────────────────────────────────
+
+export interface AssessmentPhoto {
+  id: string;
+  angle: PhotoAngle;
+  storagePath: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Strength Ranking Types ───────────────────────────────────────────
+
+export type StrengthLevel = 'beginner' | 'novice' | 'intermediate' | 'advanced' | 'elite';
+
+export interface StrengthLevelInfo {
+  level: StrengthLevel;
+  label: string;
+  color: string;
+  bgColor: string;
+  description: string;
+}
+
+export interface StrengthRanking {
+  exercise: string;
+  bestWeight: number;
+  bestReps: number;
+  estimated1RM: number;
+  bodyweightRatio: number;
+  level: StrengthLevel;
+}

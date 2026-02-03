@@ -6,6 +6,7 @@ import UserProfileForm from '@/components/UserProfileForm';
 import AnalysisResults from '@/components/AnalysisResults';
 import WorkoutPlanComponent from '@/components/WorkoutPlan';
 import WorkoutTracker from '@/components/WorkoutTracker';
+import StrengthRankings from '@/components/StrengthRankings';
 import NutritionPlanComponent from '@/components/NutritionPlan';
 import ProgressTracker from '@/components/ProgressTracker';
 import CheckinPromptBanner from '@/components/CheckinPromptBanner';
@@ -27,8 +28,9 @@ import {
 import { useWorkoutTracker } from '@/hooks/useWorkoutTracker';
 import { useWeeklyCheckins } from '@/hooks/useWeeklyCheckins';
 import { useProgressPhotos } from '@/hooks/useProgressPhotos';
+import { useAssessmentPhotos } from '@/hooks/useAssessmentPhotos';
 
-type Tab = 'input' | 'analysis' | 'workout' | 'tracker' | 'nutrition' | 'progress';
+type Tab = 'input' | 'analysis' | 'workout' | 'tracker' | 'rankings' | 'nutrition' | 'progress';
 
 interface ProgressEntry {
   id: string;
@@ -82,6 +84,18 @@ export default function HomeClient() {
   const workoutTracker = useWorkoutTracker(supabaseRef, userId, assessmentId, workoutPlan);
   const weeklyCheckins = useWeeklyCheckins(supabaseRef, userId);
   const progressPhotos = useProgressPhotos(supabaseRef, userId);
+  const assessmentPhotos = useAssessmentPhotos(supabaseRef, userId);
+
+  // Sync assessment photos loaded from Supabase into local photos state
+  useEffect(() => {
+    if (assessmentPhotos.photos.length > 0) {
+      setPhotos(prev => {
+        const hookByAngle = new Map(assessmentPhotos.photos.map(p => [p.angle, p]));
+        const merged = prev.filter(p => !hookByAngle.has(p.angle));
+        return [...merged, ...assessmentPhotos.photos];
+      });
+    }
+  }, [assessmentPhotos.photos]);
 
   // Load data on mount
   useEffect(() => {
@@ -242,6 +256,16 @@ export default function HomeClient() {
       requiresAnalysis: true,
     },
     {
+      id: 'rankings' as Tab,
+      label: 'Rankings',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0116.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.023 6.023 0 01-2.27.308 6.023 6.023 0 01-2.27-.308" />
+        </svg>
+      ),
+      requiresAnalysis: false,
+    },
+    {
       id: 'nutrition',
       label: 'Nutrition',
       icon: (
@@ -366,7 +390,12 @@ export default function HomeClient() {
 
         {activeTab === 'input' && (
           <div className="space-y-6">
-            <PhotoUpload photos={photos} onPhotosChange={setPhotos} />
+            <PhotoUpload
+              photos={photos}
+              onPhotosChange={setPhotos}
+              onPhotoFile={assessmentPhotos.uploadPhoto}
+              onPhotoRemove={assessmentPhotos.removePhoto}
+            />
             <UserProfileForm
               profile={profile}
               painAreas={painAreas}
@@ -453,6 +482,10 @@ export default function HomeClient() {
             onCompleteWorkout={workoutTracker.completeWorkout}
             onCancelWorkout={workoutTracker.cancelWorkout}
           />
+        )}
+
+        {activeTab === 'rankings' && (
+          <StrengthRankings workoutLogs={workoutTracker.workoutLogs} profile={profile} muscleGroups={analysis?.muscle?.groups} />
         )}
 
         {activeTab === 'nutrition' && nutritionPlan && recoveryPlan && (

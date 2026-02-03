@@ -437,10 +437,11 @@ export default function WorkoutTracker({
           onCancel={onCancelWorkout}
         />
       ) : (
-        <TodaysWorkout plan={plan} nextDayIndex={nextDayIndex} onStart={onStartWorkout} />
+        <>
+          <TodaysWorkout plan={plan} nextDayIndex={nextDayIndex} onStart={onStartWorkout} />
+          <WorkoutHistory logs={workoutLogs} />
+        </>
       )}
-
-      <WorkoutHistory logs={workoutLogs} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   WeeklyCheckin,
   BodyMeasurements,
   ProgressPhoto,
+  AssessmentPhoto,
   PhotoAngle,
 } from '@/lib/types'
 
@@ -443,4 +444,97 @@ export async function deleteProgressPhoto(
     .delete()
     .eq('id', photoId)
   if (error) console.error('Failed to delete photo record:', error)
+}
+
+// ── Assessment Photos ─────────────────────────────────────────────────
+
+export async function uploadAssessmentPhoto(
+  supabase: SupabaseClient,
+  userId: string,
+  file: File,
+  angle: PhotoAngle
+): Promise<AssessmentPhoto | null> {
+  const ext = file.name.split('.').pop() || 'jpg'
+  const filePath = `${userId}/assessment/${angle}.${ext}`
+
+  const { data: existing } = await supabase
+    .from('assessment_photos')
+    .select('storage_path')
+    .eq('user_id', userId)
+    .eq('angle', angle)
+    .maybeSingle()
+
+  if (existing?.storage_path && existing.storage_path !== filePath) {
+    await supabase.storage.from('progress-photos').remove([existing.storage_path])
+  }
+
+  const { error: uploadError } = await supabase.storage
+    .from('progress-photos')
+    .upload(filePath, file, { contentType: file.type, upsert: true })
+
+  if (uploadError) {
+    console.error('Failed to upload assessment photo:', uploadError)
+    return null
+  }
+
+  const { data, error: dbError } = await supabase
+    .from('assessment_photos')
+    .upsert(
+      {
+        user_id: userId,
+        angle,
+        storage_path: filePath,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,angle' }
+    )
+    .select('*')
+    .single()
+
+  if (dbError) {
+    console.error('Failed to save assessment photo record:', dbError)
+    return null
+  }
+
+  return {
+    id: data.id,
+    angle: data.angle as PhotoAngle,
+    storagePath: data.storage_path,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  }
+}
+
+export async function loadAssessmentPhotos(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<AssessmentPhoto[]> {
+  const { data, error } = await supabase
+    .from('assessment_photos')
+    .select('*')
+    .eq('user_id', userId)
+    .order('angle', { ascending: true })
+
+  if (error || !data) return []
+
+  return data.map((row) => ({
+    id: row.id,
+    angle: row.angle as PhotoAngle,
+    storagePath: row.storage_path,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }))
+}
+
+export async function deleteAssessmentPhoto(
+  supabase: SupabaseClient,
+  photoId: string,
+  storagePath: string
+): Promise<void> {
+  await supabase.storage.from('progress-photos').remove([storagePath])
+  const { error } = await supabase
+    .from('assessment_photos')
+    .delete()
+    .eq('id', photoId)
+  if (error) console.error('Failed to delete assessment photo record:', error)
 }

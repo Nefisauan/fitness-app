@@ -1,6 +1,7 @@
 'use client';
 
 import { PhysiqueAnalysis } from '@/lib/types';
+import { getMuscleScoreLevel } from '@/lib/strength-standards';
 import BodyMap from './BodyMap';
 
 interface AnalysisResultsProps {
@@ -41,6 +42,15 @@ function DevelopmentBadge({ development }: { development: string }) {
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[development] || 'bg-slate-700 text-slate-300'}`}>
       {labels[development] || development}
+    </span>
+  );
+}
+
+function StrengthLevelBadge({ score }: { score: number }) {
+  const level = getMuscleScoreLevel(score);
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${level.bgColor} ${level.color}`}>
+      {level.label}
     </span>
   );
 }
@@ -241,7 +251,10 @@ export default function AnalysisResults({ analysis }: AnalysisResultsProps) {
               <div key={index} className="pb-3 border-b border-slate-700/50 last:border-0">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-slate-100">{group.name}</span>
-                  <DevelopmentBadge development={group.development} />
+                  <div className="flex items-center gap-2">
+                    <StrengthLevelBadge score={group.score} />
+                    <DevelopmentBadge development={group.development} />
+                  </div>
                 </div>
                 <ScoreBar score={group.score} color="bg-blue-500" />
                 {group.notes && (

@@ -1,24 +1,26 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { UploadedMedia } from '@/lib/types';
+import { UploadedMedia, PhotoAngle } from '@/lib/types';
 
 interface PhotoUploadProps {
   onPhotosChange: (photos: UploadedMedia[]) => void;
   photos: UploadedMedia[];
+  onPhotoFile?: (file: File, angle: PhotoAngle) => Promise<void>;
+  onPhotoRemove?: (angle: PhotoAngle) => Promise<void>;
 }
 
-const photoAngles: { id: UploadedMedia['angle']; label: string; description: string }[] = [
+const photoAngles: { id: PhotoAngle; label: string; description: string }[] = [
   { id: 'front', label: 'Front View', description: 'Stand facing the camera, arms relaxed at sides' },
   { id: 'side', label: 'Side View', description: 'Stand sideways, maintain natural posture' },
   { id: 'back', label: 'Back View', description: 'Stand facing away from camera' },
 ];
 
-export default function PhotoUpload({ onPhotosChange, photos }: PhotoUploadProps) {
+export default function PhotoUpload({ onPhotosChange, photos, onPhotoFile, onPhotoRemove }: PhotoUploadProps) {
   const [dragActive, setDragActive] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const handleFile = (file: File, angle: UploadedMedia['angle']) => {
+  const handleFile = (file: File, angle: PhotoAngle) => {
     if (!file.type.startsWith('image/')) {
       alert('Please upload an image file');
       return;
@@ -39,9 +41,13 @@ export default function PhotoUpload({ onPhotosChange, photos }: PhotoUploadProps
       onPhotosChange(updatedPhotos);
     };
     reader.readAsDataURL(file);
+
+    if (onPhotoFile) {
+      onPhotoFile(file, angle);
+    }
   };
 
-  const handleDrop = (e: React.DragEvent, angle: UploadedMedia['angle']) => {
+  const handleDrop = (e: React.DragEvent, angle: PhotoAngle) => {
     e.preventDefault();
     setDragActive(null);
 
@@ -51,18 +57,21 @@ export default function PhotoUpload({ onPhotosChange, photos }: PhotoUploadProps
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, angle: UploadedMedia['angle']) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, angle: PhotoAngle) => {
     const file = e.target.files?.[0];
     if (file) {
       handleFile(file, angle);
     }
   };
 
-  const removePhoto = (angle: UploadedMedia['angle']) => {
+  const removePhoto = (angle: PhotoAngle) => {
     onPhotosChange(photos.filter(p => p.angle !== angle));
+    if (onPhotoRemove) {
+      onPhotoRemove(angle);
+    }
   };
 
-  const getPhotoForAngle = (angle: UploadedMedia['angle']) => {
+  const getPhotoForAngle = (angle: PhotoAngle) => {
     return photos.find(p => p.angle === angle);
   };
 
@@ -159,7 +168,7 @@ export default function PhotoUpload({ onPhotosChange, photos }: PhotoUploadProps
               <li>• Wear form-fitting clothing or athletic wear</li>
               <li>• Use good lighting and a plain background</li>
               <li>• Stand with a natural, relaxed posture</li>
-              <li>• Assessment photos are processed locally and not stored</li>
+              <li>• Assessment photos are stored securely in your account</li>
             </ul>
           </div>
         </div>
