@@ -1,85 +1,70 @@
 # Platform Strategy Decision
 
 **Product:** FitAI
-**Decision date:** March 2026
-**Decision:** Responsive Web App
-**Alternatives considered:** PWA (Progressive Web App), Capacitor (native iOS/Android)
+**Decision:** Web App (responsive, no PWA or Capacitor)
+**Date:** March 2026
 
 ---
 
-## Decision: Web App
+## 1. Where do your users need this product?
 
-FitAI is built as a **responsive web application** deployed on Vercel.
+FitAI's target users are independent gym-goers ages 18–35 who train 2–5x per week. They interact with the product in two contexts:
 
----
+- **Before/after the gym (mobile):** Checking their workout plan, logging sets during a session, or doing a weekly check-in from their phone
+- **Initial setup (desktop or mobile):** Completing their fitness profile and generating their AI assessment — this is a deliberate, focused task that works on either device
 
-## Options Considered
-
-### Option 1: Responsive Web App ✅ Selected
-
-**What it is:** A Next.js app that works on any browser — desktop, mobile, or tablet — without installation.
-
-**Why we chose this:**
-
-1. **Zero install friction.** The core user action (completing an AI assessment) happens once. Users won't install an app for a one-time task. A URL they can open immediately removes the biggest conversion barrier.
-
-2. **Desktop is the right context.** Filling out a detailed fitness profile, reading a multi-section analysis, and reviewing a workout plan is a deliberate, focused activity — better suited to desktop than a native phone app.
-
-3. **Fastest path to user feedback.** For a product in early validation, web allows sharing a link and getting feedback the same day. No App Store review, no TestFlight invite needed.
-
-4. **Vercel deployment is instant.** Every push to `main` ships automatically. This is critical during a sprint cycle where we're iterating on features weekly.
-
-5. **Tech stack alignment.** Next.js + Supabase is the right stack for this product's combination of server-side auth, AI API calls, and real-time data. Adding Capacitor would require significant native build tooling without meaningful payoff.
-
-**Tradeoffs accepted:**
-- No push notifications (relevant for workout reminders — could add PWA later)
-- No offline access (acceptable; analysis requires an internet connection anyway)
-- Mobile experience is good but not app-store-native-polished
+The product needs to work on **mobile and desktop browsers**. It does not need to be pinned to a home screen or available offline.
 
 ---
 
-### Option 2: PWA (Progressive Web App)
+## 2. Does it need device hardware?
 
-**What it is:** A web app enhanced with a service worker to enable installability, offline caching, and push notifications.
+Minimally. The only hardware-adjacent feature is photo upload (front/side/back physique photos for the assessment). This works fine via browser `<input type="file" accept="image/*" capture>` on mobile — no native camera API is required.
 
-**Why we didn't choose it now:**
-
-- The app's core value (AI analysis) requires a live API call — offline mode doesn't meaningfully improve the experience
-- Push notifications for workout reminders are a future-state feature, not MVP
-- PWA adds complexity (service worker, manifest, cache strategy) without current user need
-- "Add to Home Screen" adoption rates are typically low unless the app is used daily — FitAI's current usage pattern is weekly check-ins, not daily opens
-
-**When we'd revisit:** If retention data shows that users return frequently enough that home screen access matters, or if we implement workout reminders.
+There are no features that need GPS, accelerometer, background location, Bluetooth, or sensors. A native shell adds no functional value at this stage.
 
 ---
 
-### Option 3: Capacitor (Native iOS + Android)
+## 3. Platform Decision
 
-**What it is:** Wraps the web app in a native shell, allowing App Store / Play Store distribution and access to native device APIs (camera, accelerometer, etc.).
+**Web-only (responsive Next.js app deployed on Vercel)**
 
-**Why we didn't choose it:**
+No PWA features, no Capacitor wrapper.
 
-- App Store review adds 1–7 days to any feature release — incompatible with weekly sprint cycles
-- Requires Apple Developer account ($99/yr) and Android distribution setup
-- Camera access for photo upload works fine in mobile browsers via `<input type="file" accept="image/*" capture>`
-- No current feature requires native APIs that aren't available in the browser
-- The target user base is spread across desktop and mobile — a native app would only serve mobile users
+---
 
-**When we'd revisit:** If we build features requiring background location (outdoor training tracking), real-time camera analysis, or if the product achieves the scale where App Store discoverability is a meaningful acquisition channel.
+## 4. Justification
+
+Using the platform decision framework:
+
+| Factor | Assessment |
+|---|---|
+| Install friction | Core action (AI assessment) happens once — users won't install an app for a one-time task |
+| Offline need | Analysis requires a live API call to Claude — offline mode doesn't improve the experience |
+| Native hardware | Not needed — browser file picker covers photo upload |
+| Distribution | Sharing a URL is zero-friction; App Store review adds 1–7 days per release |
+| Release cadence | Weekly sprint cycle — Vercel ships on every push, App Store doesn't |
+| Desktop need | Profile setup and plan review are better on desktop — native apps don't cover this |
+| Daily vs. weekly use | Users check in weekly, not daily — home screen presence matters less |
+
+A web app reaches 100% of the target audience (desktop + mobile) with no friction, ships instantly, and matches the usage pattern. PWA would add service worker complexity without a meaningful user benefit today. Capacitor would break the sprint cycle and add no features the browser can't handle.
+
+---
+
+## 5. What signal would change your mind?
+
+I would add **PWA features** (specifically: install prompt + push notifications) if:
+- Retention data shows users returning 3+ times per week (daily-ish usage pattern where home screen matters)
+- Users explicitly ask for workout reminder notifications
+- Weekly check-in completion rate is low and push nudges could fix it
+
+I would consider **Capacitor** if:
+- A core feature required native sensor access (e.g., real-time rep counting via accelerometer, Apple Health sync, Bluetooth heart rate monitor integration)
+- The product grew to a scale where App Store discoverability was a meaningful acquisition channel
+- A significant portion of users requested an app and the browser experience on mobile felt meaningfully inferior
 
 ---
 
 ## Summary
 
-| Criterion | Web | PWA | Capacitor |
-|---|---|---|---|
-| Time to ship | Instant | +1 day setup | +1–2 weeks |
-| User install required | No | Optional | Yes |
-| Desktop support | Yes | Yes | No |
-| Offline support | No | Yes | Yes |
-| Push notifications | No | Yes | Yes |
-| Native camera | Browser API | Browser API | Native |
-| App Store presence | No | No | Yes |
-| Right for current stage | **Yes** | Marginal | No |
-
-The web app is the right platform for FitAI at this stage. We will revisit PWA features (specifically push notifications for workout reminders and check-in nudges) in Sprint 5 if retention data supports it.
+Web-only is the right decision for FitAI at this stage. The target user accesses this on whatever device is in front of them, the core value is delivered via API call not device hardware, and the weekly sprint cycle requires frictionless deployment. PWA and Capacitor solve problems FitAI doesn't have yet.
